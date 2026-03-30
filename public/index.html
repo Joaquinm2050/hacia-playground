@@ -1,1 +1,1003 @@
-test content for public/index.html placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Architecture Playground v3.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#0d0f1a;--ink-2:#22263a;--ink-3:#565c72;--ink-4:#9097ae;
+  --bg:#f1f3f8;--bg-2:#ffffff;--bg-3:#eaedf5;--rule:#d6dae6;
+  --accent:#2356e8;--accent-2:#1844c8;--accent-lt:#eef2ff;--accent-mid:#b8c7ff;
+  --danger:#c0182a;--danger-lt:#fdf2f3;
+  --success:#0a7a52;--success-lt:#e8f7f2;
+  --amber:#9a4e00;--amber-lt:#fff8ed;
+  --purple:#5535cc;--purple-lt:#f3f0ff;--purple-mid:#c8c0f0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;min-height:100vh}
+.hdr{background:var(--ink);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.07)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.hdr-name{font-size:13px;font-weight:600;color:#fff}
+.hdr-sep{width:1px;height:16px;background:rgba(255,255,255,.12)}
+.hdr-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,.35)}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.hdr-ver{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.22);letter-spacing:1.5px;text-transform:uppercase}
+.lang-toggle{display:flex;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;overflow:hidden}
+.lang-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;padding:5px 11px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.38);transition:all .15s}
+.lang-btn.active{background:var(--accent);color:#fff}
+.lang-btn:hover:not(.active){color:rgba(255,255,255,.7)}
+.hdr-nav{display:flex;align-items:center;gap:2px;margin:0 16px}
+.nav-tab{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:5px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.38);transition:all .15s;white-space:nowrap}
+.nav-tab:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.06)}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,.1)}
+.nav-tab-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle;position:relative;top:-1px}
+.page{display:none}.page.active{display:block}
+.hero{background:var(--ink);padding:52px 48px 0;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.hero-eye{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:20px;display:inline-flex;align-items:center;gap:10px}
+.hero-eye::before,.hero-eye::after{content:'';display:block;width:24px;height:1px;background:rgba(255,255,255,.15)}
+.hero h1{font-size:44px;font-weight:700;line-height:1.1;letter-spacing:-1.5px;color:#fff;max-width:640px;margin:0 auto 16px}
+.hero h1 em{font-style:normal;color:transparent;background:linear-gradient(90deg,#7ba8ff,#a5b4fc);-webkit-background-clip:text;background-clip:text}
+.hero-p{font-size:14.5px;color:rgba(255,255,255,.45);max-width:500px;margin:0 auto 44px;line-height:1.75}
+.stats-row{display:flex;align-items:stretch;justify-content:center;max-width:520px;margin:0 auto;border:1px solid rgba(255,255,255,.08);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden;background:rgba(255,255,255,.03)}
+.stat-item{flex:1;padding:18px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.stat-item:last-child{border-right:none}
+.stat-n{font-size:26px;font-weight:700;line-height:1;color:#fff;letter-spacing:-1px}
+.stat-l{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-top:5px}
+.tbar{background:var(--bg-2);border-bottom:1px solid var(--rule);padding:0 48px}
+.tbar-inner{display:flex;align-items:flex-end;gap:12px;padding:16px 0;max-width:1200px;margin:0 auto}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4)}
+select{appearance:none;background:var(--bg-2);border:1.5px solid var(--rule);border-radius:6px;color:var(--ink);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;padding:9px 36px 9px 13px;min-width:220px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%239097ae' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(35,86,232,.12)}
+.tbar-sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s;white-space:nowrap}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-p:hover{background:var(--accent-2);border-color:var(--accent-2);transform:translateY(-1px)}
+.btn-g{background:var(--bg-2);border-color:var(--rule);color:var(--ink-2)}
+.btn-g:hover{border-color:var(--ink-4);background:var(--bg-3)}
+.canvas{padding:28px 48px 56px;max-width:1296px;margin:0 auto}
+.cs{background:var(--bg-2);border:1.5px solid var(--rule);border-radius:8px;margin-bottom:20px;display:grid;grid-template-columns:72px 1fr auto;overflow:hidden;animation:su .3s ease}
+.cs-ico{background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:28px}
+.cs-body{padding:18px 24px;border-right:1px solid var(--rule)}
+.cs-kicker{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.cs-title{font-size:18px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:5px;letter-spacing:-.3px}
+.cs-desc{font-size:12.5px;color:var(--ink-3);line-height:1.65;max-width:580px}
+.cs-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid}
+.ta{background:var(--accent-lt);border-color:var(--accent-mid);color:var(--accent)}
+.tb{background:var(--danger-lt);border-color:#f0b8be;color:var(--danger)}
+.tc{background:var(--amber-lt);border-color:#f0ccaa;color:var(--amber)}
+.cs-met{display:flex;align-items:center;padding:0 28px;gap:28px}
+.met{text-align:center}
+.met-v{font-size:21px;font-weight:700;color:var(--success);line-height:1;letter-spacing:-.5px}
+.met-l{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-4);margin-top:4px}
+.met-d{width:1px;height:28px;background:var(--rule)}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1.5px solid var(--rule);border-radius:8px;overflow:hidden;animation:su .3s ease}
+.ap{background:var(--bg-2)}
+.ap-head{padding:12px 22px;border-bottom:1px solid var(--rule);background:var(--bg-3);display:flex;align-items:center;justify-content:space-between}
+.ap-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:var(--ink-2);font-weight:500}
+.ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ld-b{background:var(--danger)}.ld-a{background:var(--success)}
+.ap-sub{font-size:11px;color:var(--ink-4);font-style:italic}
+.ab{padding:28px 32px;min-height:340px}
+.flow{display:flex;flex-direction:column;align-items:center}
+.node{width:100%;max-width:258px;padding:9px 14px;border-radius:7px;font-size:11.5px;text-align:center;line-height:1.4;border:1px solid;transition:box-shadow .15s,transform .15s;cursor:default}
+.start{background:linear-gradient(135deg,var(--ink-2),var(--ink));border-color:var(--ink);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:500;letter-spacing:.5px}
+.end-node{background:linear-gradient(135deg,var(--ink-2),var(--ink));border-color:var(--ink);color:#fff;font-size:11px;font-weight:500}
+.pain{background:linear-gradient(135deg,#fdf2f3,#fce8ea);border-color:#e8a0a8;color:var(--danger);font-weight:500}
+.gain{background:linear-gradient(135deg,#e8f7f2,#d8f2ea);border-color:#80ccb8;color:var(--success);font-weight:500}
+.agent{background:linear-gradient(135deg,#eef2ff,#e4ecff);border-color:#98b4ff;color:var(--accent);font-weight:700;box-shadow:0 0 0 0 rgba(35,86,232,0)}
+.decision{background:linear-gradient(135deg,#fff8ed,#fff1d8);border-color:#e8c080;color:var(--amber);font-size:10.5px;font-weight:600;border-radius:12px}
+.conn{width:2px;height:20px;background:linear-gradient(to bottom,var(--rule),#c8cede);position:relative;border-radius:1px}
+.conn::after{content:'▾';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--ink-4);line-height:1}
+.conn-ai{background:linear-gradient(to bottom,#a0dcca,#6cc4a8)}.conn-ai::after{color:var(--success)}
+.branch{display:flex;gap:10px;width:100%;justify-content:center;align-items:flex-start}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center}
+.blbl{font-family:'IBM Plex Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-4);margin-bottom:4px}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;gap:10px;background:var(--bg-3)}
+.ph-icon{width:40px;height:40px;border:1.5px dashed var(--rule);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.ph-txt{font-size:12px;text-align:center;line-height:1.65;max-width:180px;color:var(--ink-4)}
+.empty{border:1.5px dashed var(--rule);border-radius:8px;background:var(--bg-2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;gap:14px;text-align:center}
+.empty-ico{font-size:32px;opacity:.2}
+.empty-title{font-size:17px;font-weight:600;color:var(--ink-3)}
+.empty-sub{font-size:12.5px;color:var(--ink-4);line-height:1.65;max-width:300px}
+.fn{margin-top:24px;padding-top:18px;border-top:1px solid var(--rule);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-4);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ts-wrap{margin-top:20px;background:var(--bg-2);border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
+.ts-head{padding:13px 22px;border-bottom:1px solid var(--rule);background:var(--ink);display:flex;align-items:center;justify-content:space-between}
+.ts-title{font-size:12.5px;font-weight:600;color:#fff}
+.ts-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.3)}
+.ts-table{width:100%;border-collapse:collapse}
+.ts-table th{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-4);padding:10px 16px;border-bottom:1px solid var(--rule);background:var(--bg-3);text-align:left;font-weight:500}
+.ts-table td{padding:11px 16px;border-bottom:1px solid var(--rule);font-size:12px;vertical-align:top}
+.ts-table tr:last-child td{border-bottom:none}
+.ts-table tr:hover td{background:var(--bg-3)}
+.ts-cat{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);font-weight:500;white-space:nowrap}
+.ts-tools{display:flex;flex-wrap:wrap;gap:5px}
+.chip{display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 8px;border-radius:4px;border:1px solid;white-space:nowrap}
+.chip-ai{background:var(--accent-lt);border-color:var(--accent-mid);color:var(--accent)}
+.chip-db{background:var(--success-lt);border-color:#a0dcca;color:var(--success)}
+.chip-infra{background:var(--purple-lt);border-color:var(--purple-mid);color:var(--purple)}
+.chip-frame{background:var(--amber-lt);border-color:#f0ccaa;color:var(--amber)}
+.chip-lang{background:var(--bg-3);border-color:var(--rule);color:var(--ink-2)}
+.chip-int{background:var(--danger-lt);border-color:#f0b8c0;color:var(--danger)}
+.ts-note{font-size:11.5px;color:var(--ink-3);line-height:1.55}
+.kpi-wrap{margin-top:20px}
+.kpi-section-head{background:var(--ink);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:8px 8px 0 0}
+.kpi-section-title{font-size:12.5px;font-weight:600;color:#fff}
+.kpi-section-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.3)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1.5px solid var(--rule);border-top:none;overflow:hidden}.kpi-grid-5{grid-template-columns:repeat(5,1fr)}
+.kpi-card{background:var(--bg-2);padding:20px 22px 22px}
+.kpi-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px}
+.kpi-name{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);line-height:1.45;flex:1;font-weight:500}
+.kpi-dir{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid;white-space:nowrap;flex-shrink:0}
+.kpi-dir-down{background:var(--success-lt);border-color:#a0dcca;color:var(--success)}
+.kpi-dir-up{background:var(--accent-lt);border-color:var(--accent-mid);color:var(--accent)}
+.kpi-bar-track{height:4px;background:var(--rule);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.22,.68,0,1.2) .4s}
+.kpi-bar-green{background:var(--success)}.kpi-bar-blue{background:var(--accent)}
+.kpi-ranges{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.kpi-range-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.kpi-range-val{font-size:18px;font-weight:700;line-height:1;color:var(--ink);letter-spacing:-.5px}
+.kpi-range-val.good{color:var(--success)}.kpi-range-val.mid{color:var(--amber)}
+.kpi-baseline-row{display:flex;align-items:center;gap:7px;padding-top:10px;border-top:1px solid var(--rule)}
+.kpi-baseline-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-4)}
+.kpi-baseline-val{font-size:12px;color:var(--ink-2);font-weight:600}
+.kpi-note{font-size:11.5px;color:var(--ink-3);line-height:1.55;margin-top:9px}
+.kpi-source{font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--ink-4);margin-top:7px}
+.kpi-footer{background:var(--bg-3);border:1.5px solid var(--rule);border-top:none;padding:12px 22px;display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-4);border-radius:0 0 8px 8px}
+.kpi-footer-dot{width:5px;height:5px;border-radius:50%;background:var(--ink-4);flex-shrink:0}
+#ov{display:none;position:fixed;inset:0;background:rgba(241,243,248,.9);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center}
+#ov.show{display:flex}
+.lc{background:var(--bg-2);border:1.5px solid var(--rule);border-radius:10px;padding:36px 52px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.09)}
+.lt{font-size:18px;font-weight:700;color:var(--ink);margin-top:18px;margin-bottom:5px}
+.ls{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4)}
+.pb-w{width:200px;height:2px;background:var(--rule);border-radius:2px;margin:18px auto 0;overflow:hidden}
+.pb-f{height:100%;background:var(--accent);border-radius:2px;animation:prog 1.6s ease forwards}
+.az-hero{background:var(--ink);padding:48px 48px 0;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.az-hero-eye{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:18px;display:inline-flex;align-items:center;gap:10px}
+.az-hero-eye::before,.az-hero-eye::after{content:'';display:block;width:24px;height:1px;background:rgba(255,255,255,.15)}
+.az-hero h1{font-size:38px;font-weight:700;line-height:1.1;letter-spacing:-1.2px;color:#fff;max-width:620px;margin:0 auto 14px}
+.az-hero h1 em{font-style:normal;color:transparent;background:linear-gradient(90deg,#7ba8ff,#a5b4fc);-webkit-background-clip:text;background-clip:text}
+.az-hero p{font-size:14px;color:rgba(255,255,255,.42);max-width:520px;margin:0 auto 40px;line-height:1.75}
+.az-steps-row{display:flex;align-items:stretch;justify-content:center;max-width:700px;margin:0 auto;border:1px solid rgba(255,255,255,.08);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden;background:rgba(255,255,255,.03)}
+.az-step{flex:1;padding:16px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.az-step:last-child{border-right:none}
+.az-step-n{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:5px}
+.az-step-l{font-size:12px;font-weight:600;color:rgba(255,255,255,.6)}
+.az-canvas{padding:28px 48px 64px;max-width:1100px;margin:0 auto}
+.az-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.az-card{background:var(--bg-2);border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
+.az-card-head{padding:12px 18px;border-bottom:1px solid var(--rule);background:var(--bg-3);display:flex;align-items:center;gap:10px}
+.az-card-icon{font-size:16px}
+.az-card-label{font-size:12px;font-weight:600;color:var(--ink)}
+.az-card-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-4);margin-left:auto}
+.az-card-body{padding:16px 18px}
+textarea{width:100%;min-height:130px;resize:vertical;border:1.5px solid var(--rule);border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);background:var(--bg-2);padding:11px 13px;line-height:1.6;transition:border-color .15s,box-shadow .15s}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(35,86,232,.1)}
+textarea::placeholder{color:var(--ink-4)}
+.az-upload{border:1.5px dashed var(--rule);border-radius:6px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg-3);position:relative}
+.az-upload:hover,.az-upload.drag-over{border-color:var(--accent);background:var(--accent-lt)}
+.az-upload.loaded{border-color:var(--success);background:var(--success-lt);border-style:solid}
+.az-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.az-upload-icon{font-size:24px;margin-bottom:8px}
+.az-upload-txt{font-size:12.5px;font-weight:500;color:var(--ink-3)}
+.az-upload-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-4);margin-top:4px}
+.az-upload-name{font-size:11.5px;font-weight:600;color:var(--accent);margin-top:8px;display:none}
+.az-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.az-meta-field{display:flex;flex-direction:column;gap:5px}
+.az-meta-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4)}
+.az-meta-input{border:1.5px solid var(--rule);border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--ink);background:var(--bg-2);padding:8px 12px;transition:border-color .15s}
+.az-meta-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(35,86,232,.1)}
+.az-meta-input::placeholder{color:var(--ink-4);font-weight:400}
+.az-action-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--bg-2);border:1.5px solid var(--rule);border-radius:8px;margin-bottom:16px}
+.az-action-note{font-size:12px;color:var(--ink-3);max-width:480px;line-height:1.6}
+.az-action-note strong{color:var(--ink);font-weight:600}
+.az-action-btns{display:flex;gap:8px;flex-shrink:0}
+.btn-az{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s;white-space:nowrap}
+.btn-az-p{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-az-p:hover{background:var(--accent-2);border-color:var(--accent-2);transform:translateY(-1px)}
+.btn-az-g{background:var(--bg-2);border-color:var(--rule);color:var(--ink-2)}
+.btn-az-g:hover{border-color:var(--ink-4);background:var(--bg-3)}
+.btn-az-pu{background:var(--purple);border-color:var(--purple);color:#fff}
+.btn-az-pu:hover{background:#4020aa;border-color:#4020aa;transform:translateY(-1px)}
+.btn-az:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.transcript-section{background:var(--bg-2);border:1.5px solid var(--purple-mid);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.transcript-head{padding:13px 20px;border-bottom:1px solid var(--purple-mid);background:linear-gradient(135deg,var(--purple-lt) 0%,#ede9ff 100%);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.transcript-head-left{display:flex;align-items:center;gap:10px}
+.transcript-badge{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;background:var(--purple);color:#fff;padding:2px 8px;border-radius:3px}
+.transcript-title{font-size:13px;font-weight:700;color:var(--purple);letter-spacing:-.1px}
+.transcript-sub{font-size:11px;color:var(--purple);opacity:.7}
+.transcript-body{padding:16px 18px}
+.transcript-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.flowmap-output{display:none;margin-top:16px;border:1.5px solid var(--purple-mid);border-radius:8px;overflow:hidden;animation:su .4s ease}
+.flowmap-output.show{display:block}
+.flowmap-head{padding:12px 18px;border-bottom:1px solid var(--purple-mid);background:linear-gradient(135deg,var(--purple-lt),#ede9ff);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.flowmap-title{font-size:12.5px;font-weight:700;color:var(--purple)}
+.flowmap-actions{display:flex;gap:8px}
+.flowmap-canvas-wrap{background:var(--bg-2);padding:20px;overflow:auto}
+.flowmap-canvas{display:flex;gap:32px;min-width:max-content;padding:8px}
+.fmc-process{display:flex;flex-direction:column;align-items:center;min-width:220px;max-width:280px}
+.fmc-process-title{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple);margin-bottom:12px;padding:4px 12px;background:var(--purple-lt);border:1px solid var(--purple-mid);border-radius:3px;text-align:center}
+.fmc-node{width:100%;padding:9px 14px;border-radius:6px;font-size:11.5px;text-align:center;line-height:1.4;border:1px solid;position:relative;cursor:default}
+.fmc-conn{width:2px;height:18px;background:linear-gradient(to bottom,var(--rule),#c8cede);position:relative;flex-shrink:0;border-radius:1px}
+.fmc-conn::after{content:'▾';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--ink-4);line-height:1}
+.fmc-branch{display:flex;gap:8px;width:100%;align-items:flex-start;justify-content:center}
+.fmc-bcol{flex:1;display:flex;flex-direction:column;align-items:center}
+.fmc-blbl{font-family:'IBM Plex Mono',monospace;font-size:7.5px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-4);margin-bottom:4px}
+.flowmap-drag-hint{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--purple-lt);border-top:1px solid var(--purple-mid);font-size:11.5px;color:var(--purple)}
+.flowmap-drag-icon{font-size:16px}
+.az-upload.drop-glow{border-color:var(--purple)!important;background:var(--purple-lt)!important;box-shadow:0 0 0 4px rgba(85,53,204,.15)}
+.az-output{display:none;animation:su .4s ease}
+.az-out-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.az-out-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.az-out-sub{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-4);margin-top:3px}
+.az-summary{background:var(--ink);border-radius:8px;padding:24px 28px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+.az-summary-name{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px}
+.az-summary-title{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.4px;margin-bottom:8px}
+.az-summary-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;max-width:560px}
+.az-summary-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.az-summary-tag{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:3px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55)}
+.az-summary-kpis{display:flex;flex-direction:column;gap:10px;min-width:160px}
+.az-summary-kpi{text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:10px 16px}
+.az-summary-kpi-v{font-size:20px;font-weight:700;color:#7ba8ff;letter-spacing:-.5px;line-height:1}
+.az-summary-kpi-l{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
+.az-reco{background:var(--accent-lt);border:1.5px solid var(--accent-mid);border-radius:8px;padding:18px 22px;margin-bottom:16px}
+.az-reco-title{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.az-reco-title::before{content:'★';font-size:11px}
+.az-reco-list{display:flex;flex-direction:column;gap:6px}
+.az-reco-item{font-size:12.5px;color:var(--ink-2);line-height:1.55;display:flex;gap:8px}
+.az-reco-item::before{content:'→';color:var(--accent);font-weight:600;flex-shrink:0;margin-top:1px}
+.ci-panel{border-radius:8px;overflow:hidden;margin-bottom:16px;border:1.5px solid var(--rule)}
+.ci-head{padding:14px 22px;display:flex;align-items:center;justify-content:space-between;background:var(--ink-2)}
+.ci-head-title{font-size:13px;font-weight:700;color:#fff}
+.ci-head-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px}
+.ci-badge{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;border:1.5px solid}
+.ci-badge-high{background:rgba(10,122,82,.15);border-color:#4fd4a8;color:#4fd4a8}
+.ci-badge-med{background:rgba(154,78,0,.15);border-color:#f0b060;color:#f0b060}
+.ci-badge-low{background:rgba(192,24,42,.15);border-color:#f08090;color:#f08090}
+.ci-body{background:var(--bg-2);padding:20px 24px}
+.ci-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.ci-metric{background:var(--bg-3);border:1px solid var(--rule);border-radius:6px;padding:14px 16px}
+.ci-metric-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-4);margin-bottom:8px}
+.ci-meter-track{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.ci-meter-fill{height:100%;border-radius:3px;transition:width 1.4s cubic-bezier(.22,.68,0,1.2) .5s}
+.ci-meter-high{background:linear-gradient(90deg,#0a7a52,#4fd4a8)}
+.ci-meter-med{background:linear-gradient(90deg,#9a4e00,#f0b060)}
+.ci-meter-low{background:linear-gradient(90deg,#c0182a,#f08090)}
+.ci-metric-value{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.ci-metric-value.high{color:var(--success)}.ci-metric-value.med{color:var(--amber)}.ci-metric-value.low{color:var(--danger)}
+.ci-metric-note{font-size:10.5px;color:var(--ink-3);line-height:1.5;margin-top:5px}
+.ci-flags{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.ci-flag{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:5px;border:1px solid}
+.ci-flag-ok{background:#f0faf6;border-color:#a0dcca}
+.ci-flag-warn{background:var(--amber-lt);border-color:#f0ccaa}
+.ci-flag-risk{background:var(--danger-lt);border-color:#f0b8be}
+.ci-flag-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.ci-flag-text{font-size:12px;line-height:1.55}
+.ci-flag-text strong{font-weight:600}
+.ci-verdict{padding:12px 16px;border-radius:6px;font-size:12.5px;line-height:1.6;border:1.5px solid;display:flex;gap:10px;align-items:flex-start}
+.ci-verdict-go{background:#e8f7f2;border-color:#a0dcca;color:var(--success)}
+.ci-verdict-caution{background:var(--amber-lt);border-color:#f0ccaa;color:var(--amber)}
+.ci-verdict-hold{background:var(--danger-lt);border-color:#f0b8be;color:var(--danger)}
+.ci-verdict-icon{font-size:16px;flex-shrink:0}
+.ci-footer{background:var(--bg-3);border-top:1px solid var(--rule);padding:10px 24px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:var(--ink-4)}
+.az-loading{display:none;flex-direction:column;align-items:center;justify-content:center;padding:44px 40px;gap:12px;text-align:center;background:var(--bg-2);border:1.5px solid var(--rule);border-radius:8px;margin-bottom:16px}
+.az-steps-loader{display:flex;flex-direction:column;gap:0;width:100%;max-width:320px;margin:8px 0 4px}
+.az-step-item{display:flex;align-items:center;gap:12px;padding:8px 0;opacity:.22;transition:opacity .35s,transform .35s}
+.az-step-item.active{opacity:1;transform:translateX(5px)}
+.az-step-item.done{opacity:.5}
+.az-step-dot{width:9px;height:9px;border-radius:50%;background:var(--rule);flex-shrink:0;transition:background .3s,box-shadow .3s,transform .3s}
+.az-step-item.active .az-step-dot{background:var(--accent);transform:scale(1.25);box-shadow:0 0 0 4px rgba(35,86,232,.15);animation:sdot .9s ease-in-out infinite}
+.az-step-item.done .az-step-dot{background:var(--success);transform:scale(1);box-shadow:none}
+.az-step-text{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-3);letter-spacing:.3px;transition:color .35s,font-weight .2s}
+.az-step-item.active .az-step-text{color:var(--accent);font-weight:600}
+.az-step-item.done .az-step-text{color:var(--success)}
+@keyframes sdot{0%,100%{box-shadow:0 0 0 4px rgba(35,86,232,.15)}50%{box-shadow:0 0 0 8px rgba(35,86,232,.04)}}
+.az-loading.show{display:flex}
+.az-loading-title{font-size:16px;font-weight:700;color:var(--ink)}
+.az-loading-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4)}
+.az-progress{width:240px;height:2px;background:var(--rule);border-radius:2px;overflow:hidden;margin-top:4px}
+.az-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .9s ease}
+
+.az-error{background:var(--danger-lt);border:1.5px solid #f0b8be;border-radius:8px;padding:16px 20px;margin-bottom:16px;display:none}
+.az-error.show{display:block}
+.az-error-title{font-size:13px;font-weight:600;color:var(--danger);margin-bottom:4px}
+.az-error-msg{font-size:12px;color:var(--danger);opacity:.8;line-height:1.55}
+.tr-loading{display:none;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center}
+.tr-loading.show{display:flex}
+.tr-loading-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-4)}
+.tr-progress{width:180px;height:2px;background:var(--rule);border-radius:2px;overflow:hidden}
+.tr-progress-fill{height:100%;background:var(--purple);border-radius:2px;animation:az-prog 8s ease-in-out forwards}
+@keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.node:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.agent:hover{box-shadow:0 4px 16px rgba(35,86,232,.18)}
+.pain:hover{box-shadow:0 4px 12px rgba(192,24,42,.12)}
+.gain:hover{box-shadow:0 4px 12px rgba(10,122,82,.12)}
+@keyframes prog{from{width:0}to{width:100%}}
+.impact-strip{display:grid;grid-template-columns:repeat(3,1fr);background:var(--ink);border-radius:8px;overflow:hidden;margin-bottom:16px;border:1.5px solid rgba(255,255,255,.06);animation:su .4s ease}
+.impact-cell{padding:20px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
+.impact-cell:last-child{border-right:none}
+.impact-cell::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(35,86,232,.06),transparent);pointer-events:none}
+.impact-arrow{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:4px}
+.impact-arrow-down{color:#4fd4a8}.impact-arrow-up{color:#7ba8ff}
+.impact-val{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1.5px;color:#fff;font-family:'Inter',sans-serif}
+.impact-val-accent{color:#7ba8ff}
+.impact-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:6px}
+@media(max-width:960px){
+  .hdr,.tbar,.canvas,.az-canvas{padding-left:20px;padding-right:20px}
+  .hero,.az-hero{padding-left:20px;padding-right:20px}
+  .hero h1,.az-hero h1{font-size:28px}
+  .ag,.az-grid{grid-template-columns:1fr}
+  .kpi-grid,.kpi-grid-5,.ci-grid{grid-template-columns:1fr 1fr}
+  .cs{grid-template-columns:64px 1fr}.cs-met{display:none}
+  .tbar-inner{flex-wrap:wrap}
+  .az-action-bar{flex-direction:column;gap:12px;align-items:flex-start}
+  .az-meta-grid{grid-template-columns:1fr}
+  .az-summary{grid-template-columns:1fr}
+  .hdr-nav{margin:0 8px}
+}
+@media(max-width:600px){.kpi-grid,.kpi-grid-5,.ci-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="ov"><div class="lc">
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" stroke="#d6dae6" stroke-width="2"/><path d="M14 3 A11 11 0 0 1 25 14" stroke="#2356e8" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 14 14" to="360 14 14" dur=".8s" repeatCount="indefinite"/></path></svg>
+  <div class="lt" id="ovTitle">Rewiring architecture</div>
+  <div class="ls" id="ovSub">Applying agents &amp; automation logic</div>
+  <div class="pb-w"><div class="pb-f"></div></div>
+</div></div>
+<header class="hdr">
+  <div class="hdr-brand"><div class="hdr-dot"></div><span class="hdr-name">AI Architecture Playground</span><div class="hdr-sep"></div><span class="hdr-tag" id="hdrTag">Pre → Post AI Workflow Intelligence</span></div>
+  <nav class="hdr-nav">
+    <button class="nav-tab active" id="navPlayground" onclick="showPage('playground')"><span class="nav-tab-dot"></span><span id="navPgLabel">Playground</span></button>
+    <button class="nav-tab" id="navAnalyzer" onclick="showPage('analyzer')"><span id="navAzLabel">Client Analyzer</span></button>
+  </nav>
+  <div class="hdr-right">
+    <div class="lang-toggle"><button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button><button class="lang-btn" id="btnES" onclick="setLang('es')">ES</button></div>
+    <span class="hdr-ver">v3.4</span>
+  </div>
+</header>
+<div id="page-playground" class="page active">
+<section class="hero">
+  <div class="hero-eye" id="heroEye">Workflow Transformation</div>
+  <h1 id="heroH1">From Manual Friction<br>to <em>AI-Native</em> Architecture</h1>
+  <p class="hero-p" id="heroP">Select an industry and process to see the pre-AI state, then generate the rewired workflow.</p>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-n">10</div><div class="stat-l" id="statInd">Industries</div></div>
+    <div class="stat-item"><div class="stat-n">40</div><div class="stat-l" id="statUC">Use Cases</div></div>
+    <div class="stat-item"><div class="stat-n">200+</div><div class="stat-l" id="statKPI">KPI Benchmarks</div></div>
+  </div>
+</section>
+<div class="tbar"><div class="tbar-inner">
+  <div class="fg"><div class="fl" id="lblIndustry">Industry</div><select id="iSel"><option value="">Select industry</option></select></div>
+  <div class="fg"><div class="fl" id="lblProcess">Process</div><select id="dSel"><option value="">Select process</option></select></div>
+  <div class="tbar-sp"></div>
+  <button class="btn btn-g" onclick="randomize()" id="btnRandom">⇄ Random</button>
+  <button class="btn btn-p" onclick="generate()" id="btnGenerate">⚡ Generate Post-AI</button>
+</div></div>
+<main class="canvas">
+  <div id="cstrip" style="display:none"></div>
+  <div id="awrap"><div class="empty"><div class="empty-ico">◫</div><div class="empty-title" id="emptyTitle">Select a use case to begin</div><div class="empty-sub" id="emptySub">Choose an industry and process above, or click Random to explore.</div></div></div>
+  <div id="tswrap" style="display:none"></div>
+  <div id="fn" style="display:none" class="fn"></div>
+  <div id="kpiwrap" style="display:none"></div>
+</main>
+</div>
+<div id="page-analyzer" class="page">
+<section class="az-hero">
+  <div class="az-hero-eye" id="azHeroEye">AI-Powered Analysis</div>
+  <h1 id="azHeroH1">Upload. Analyze.<br><em>Architect</em> with AI.</h1>
+  <p id="azHeroP">Paste or upload your client's workflow. Claude will map the process, build the AI-native architecture, and score its own confidence.</p>
+  <div class="az-steps-row">
+    <div class="az-step"><div class="az-step-n" id="azS1N">Step 01</div><div class="az-step-l" id="azS1L">Transcript → Flowmap</div></div>
+    <div class="az-step"><div class="az-step-n" id="azS2N">Step 02</div><div class="az-step-l" id="azS2L">Load client info</div></div>
+    <div class="az-step"><div class="az-step-n" id="azS3N">Step 03</div><div class="az-step-l" id="azS3L">Generate architecture</div></div>
+  </div>
+</section>
+<div class="az-canvas">
+  <div class="transcript-section">
+    <div class="transcript-head">
+      <div class="transcript-head-left">
+        <span class="transcript-badge" id="trBadge">STEP 01</span>
+        <div><div class="transcript-title" id="trTitle">Transcript → Process Flowmap</div><div class="transcript-sub" id="trSub">Paste a meeting/discovery transcript to generate a visual flowmap of all identified processes</div></div>
+      </div>
+    </div>
+    <div class="transcript-body">
+      <textarea id="trText" style="min-height:110px" placeholder="Paste your discovery call transcript here..."></textarea>
+      <div class="transcript-actions">
+        <button class="btn-az btn-az-pu" onclick="generateFlowmap()" id="btnFlowmap">⬡ <span id="btnFlowmapLabel">Generate Process Flowmap</span></button>
+        <button class="btn-az btn-az-g" onclick="clearTranscript()" id="btnClearTr">✕ <span id="btnClearTrLabel">Clear</span></button>
+      </div>
+      <div class="tr-loading" id="trLoading">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#d6dae6" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 21 12" stroke="#5535cc" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></path></svg>
+        <div style="font-size:13px;font-weight:600;color:var(--purple)" id="trLoadingTitle">Analyzing transcript...</div>
+        <div class="tr-loading-sub" id="trLoadingSub">Identifying processes and mapping steps</div>
+        <div class="tr-progress"><div class="tr-progress-fill" id="trProgressFill"></div></div>
+      </div>
+    </div>
+    <div class="flowmap-output" id="flowmapOutput">
+      <div class="flowmap-head">
+        <div class="flowmap-title" id="flowmapTitle">📊 Process Flowmap</div>
+        <div class="flowmap-actions"><button class="btn-az btn-az-pu" style="padding:7px 14px;font-size:12px" onclick="downloadFlowmap()" id="btnDownloadFm">⬇ <span id="btnDownloadFmLabel">Download PNG</span></button></div>
+      </div>
+      <div class="flowmap-canvas-wrap"><div class="flowmap-canvas" id="flowmapCanvas"></div></div>
+      <div class="flowmap-drag-hint" id="fmDragHint"><div class="flowmap-drag-icon">🖱️</div><span id="fmDragHintText">Drag the flowmap PNG into the document upload zone below to use it as input for architecture generation</span></div>
+    </div>
+  </div>
+  <div class="az-action-bar">
+    <div class="az-action-note" id="azActionNote"><strong>Step 02 — Load workflow:</strong> Paste a text description, upload a document, or drag the flowmap PNG from above. Then fill in context and generate the full AI architecture.</div>
+    <div class="az-action-btns">
+      <button class="btn-az btn-az-g" onclick="clearAnalyzer()" id="btnClear">✕ <span id="btnClearLabel">Clear all</span></button>
+      <button class="btn-az btn-az-p" id="btnAnalyze" onclick="runAnalysis()">⚡ <span id="btnAnalyzeLabel">Analyze &amp; Generate</span></button>
+    </div>
+  </div>
+  <div class="az-grid">
+    <div class="az-card">
+      <div class="az-card-head"><span class="az-card-icon">✏️</span><span class="az-card-label" id="azCardTextLabel">Process Description</span><span class="az-card-sub" id="azCardTextSub">Text / email / notes</span></div>
+      <div class="az-card-body"><textarea id="azText" placeholder="Paste or type the client's current workflow here..."></textarea></div>
+    </div>
+    <div class="az-card">
+      <div class="az-card-head"><span class="az-card-icon">📎</span><span class="az-card-label" id="azCardFileLabel">Document Upload</span><span class="az-card-sub" id="azCardFileSub">PDF, Word, image, SVG or flowmap PNG</span></div>
+      <div class="az-card-body">
+        <div class="az-upload" id="azDropZone">
+          <input type="file" id="azFile" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.svg" onchange="handleFile(this)">
+          <div class="az-upload-icon">📄</div>
+          <div class="az-upload-txt" id="azUploadTxt">Drop file here or click to browse</div>
+          <div class="az-upload-sub" id="azUploadSub">PDF · Word · PNG/JPG · SVG · TXT · Flowmap PNG</div>
+          <div class="az-upload-name" id="azFileName"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="az-card" style="margin-bottom:16px">
+    <div class="az-card-head"><span class="az-card-icon">🏢</span><span class="az-card-label" id="azContextLabel">Client Context</span><span class="az-card-sub" id="azContextSub">Optional but improves quality</span></div>
+    <div class="az-card-body">
+      <div class="az-meta-grid">
+        <div class="az-meta-field"><span class="az-meta-label" id="azLblCompany">Company / Client name</span><input class="az-meta-input" id="azCompany" type="text" placeholder="e.g. Acme Corp"></div>
+        <div class="az-meta-field"><span class="az-meta-label" id="azLblIndustry">Industry</span><input class="az-meta-input" id="azIndustry" type="text" placeholder="e.g. Healthcare, Logistics..."></div>
+        <div class="az-meta-field"><span class="az-meta-label" id="azLblScale">Team size / Scale</span><input class="az-meta-input" id="azScale" type="text" placeholder="e.g. 50 employees..."></div>
+        <div class="az-meta-field"><span class="az-meta-label" id="azLblPain">Main pain point</span><input class="az-meta-input" id="azPain" type="text" placeholder="e.g. slow approvals..."></div>
+      </div>
+    </div>
+  </div>
+  <div class="az-error" id="azError"><div class="az-error-title" id="azErrorTitle">Analysis failed</div><div class="az-error-msg" id="azErrorMsg"></div></div>
+  <div class="az-loading" id="azLoading">
+    <div class="az-loading-title" id="azLoadingTitle">Claude is analyzing the workflow...</div>
+    <div class="az-steps-loader" id="azStepsLoader">
+      <div class="az-step-item" id="azStep0"><div class="az-step-dot"></div><div class="az-step-text" id="azStep0T">Reading workflow</div></div>
+      <div class="az-step-item" id="azStep1"><div class="az-step-dot"></div><div class="az-step-text" id="azStep1T">Mapping process</div></div>
+      <div class="az-step-item" id="azStep2"><div class="az-step-dot"></div><div class="az-step-text" id="azStep2T">Building architecture</div></div>
+      <div class="az-step-item" id="azStep3"><div class="az-step-dot"></div><div class="az-step-text" id="azStep3T">Scoring confidence</div></div>
+      <div class="az-step-item" id="azStep4"><div class="az-step-dot"></div><div class="az-step-text" id="azStep4T">Finalising analysis</div></div>
+    </div>
+    <div class="az-progress" style="margin-top:12px"><div class="az-progress-fill" id="azProgressFill"></div></div>
+    <div class="az-loading-sub" id="azLoadingSub"></div>
+  </div>
+  <div class="az-output" id="azOutput">
+    <div class="az-out-head">
+      <div><div class="az-out-title" id="azOutTitle">Analysis Complete</div><div class="az-out-sub" id="azOutSub"></div></div>
+      <div><button class="btn-az btn-az-g" onclick="clearAnalyzer()" id="btnNewAnalysis">← New Analysis</button></div>
+    </div>
+    <div id="azOutputBody"></div>
+  </div>
+</div>
+</div>
+<script>
+var LANG='en';
+var T={en:{hdrTag:'Pre → Post AI Workflow Intelligence',navPg:'Playground',navAz:'Client Analyzer',heroEye:'Workflow Transformation',heroH1:'From Manual Friction<br>to <em>AI-Native</em> Architecture',heroP:'Select an industry and process to see the pre-AI state, then generate the rewired workflow.',statInd:'Industries',statUC:'Use Cases',statKPI:'KPI Benchmarks',lblIndustry:'Industry',lblProcess:'Process',selInd:'Select industry',selProc:'Select process',btnRandom:'⇄ Random',btnGenerate:'⚡ Generate Post-AI',emptyTitle:'Select a use case to begin',emptySub:'Choose an industry and process above, or click Random to explore.',ovTitle:'Rewiring architecture',ovSub:'Applying agents & automation logic',before:'Before — Pre-AI State',after:'After — AI-Native Architecture',phTxt:'Click Generate Post-AI to see the rewired architecture',stackTitle:'Recommended Tech Stack',stackDeploy:'Deployment: Production-grade',stackCloud:'Cloud:',stackLayer:'Layer',stackTools:'Tools & Frameworks',stackRat:'Rationale',kpiTitle:'KPI Impact Analysis',kpiSub:'Conservative → Expected → Best-in-class',kpiConserv:'Conservative',kpiExpected:'Expected',kpiBest:'Best-in-class',kpiBaseline:'Pre-AI baseline:',kpiReduce:'▼ Reduce',kpiIncrease:'▲ Increase',kpiFooter:'Ranges synthesised from: McKinsey, BCG/MIT Sloan, Gartner, Accenture (2024–2026).',metTime:'Time saved',metCost:'Cost impact',metScale:'Scale',nodeKey:'Node key:',nodeManual:'■ Manual / pain',nodeAgent:'■ AI Agent',nodeAuto:'■ Automated',nodeDec:'◆ Decision',nodeEnd:'■ Start / End',trBadge:'STEP 01',trTitle:'Transcript → Process Flowmap',trSub:'Paste a meeting/discovery transcript to generate a visual flowmap of all identified processes',trPlaceholder:"Paste your discovery call transcript here...\n\nExample: 'Client: We receive about 200 invoices per month by email. Maria prints them, enters the data into Excel...'",btnFlowmap:'Generate Process Flowmap',btnClearTr:'Clear',trLoadingTitle:'Analyzing transcript...',trLoadingSub:'Identifying processes and mapping steps',flowmapTitle:'📊 Process Flowmap',btnDownloadFm:'Download PNG',fmDragHint:'Drag the flowmap PNG into the document upload zone below to use it as input for architecture generation',azHeroEye:'AI-Powered Analysis',azHeroH1:'Upload. Analyze.<br><em>Architect</em> with AI.',azHeroP:"Paste or upload your client's workflow. Claude will map the process, build the AI-native architecture, and score its own confidence.",azS1L:'Transcript → Flowmap',azS2L:'Load client info',azS3L:'Generate architecture',azActionNote:'<strong>Step 02 — Load workflow:</strong> Paste a text description, upload a document, or drag the flowmap PNG from above. Then fill in context and generate the full AI architecture.',btnClear:'Clear all',btnAnalyze:'Analyze & Generate',azCardTextLabel:'Process Description',azCardTextSub:'Text / email / notes',azCardFileLabel:'Document Upload',azCardFileSub:'PDF, Word, image, SVG or flowmap PNG',azUploadTxt:'Drop file here or click to browse',azUploadSub:'PDF · Word · PNG/JPG · SVG · TXT · Flowmap PNG',azContextLabel:'Client Context',azContextSub:'Optional but improves quality',azLblCompany:'Company / Client name',azLblIndustry:'Industry',azLblScale:'Team size / Scale',azLblPain:'Main pain point',azErrorTitle:'Analysis failed',azLoadingTitle:'Claude is analyzing the workflow...',azL1:'Reading workflow description...',azL2:'Mapping process structure...',azL3:'Generating AI architecture & confidence scores...',btnNewAnalysis:'← New Analysis',azOutSubTpl:' · AI-generated Pre → Post transformation',azReco:'Strategic Recommendations',azStackSub:'Cloud:',azKpiTitle:'KPI Impact Analysis — Post-AI Workflow',azKpiSub:'AI-estimated benchmarks',azKpiFooter:'Estimates by Claude. Validate with client data before presenting.',ciTitle:'Analysis Confidence & Viability Score',ciSub:'Self-assessed by Claude based on input quality',ciOverallHigh:'HIGH CONFIDENCE',ciOverallMed:'MEDIUM CONFIDENCE',ciOverallLow:'LOW CONFIDENCE',ciDimLabel1:'Input Comprehension',ciDimLabel2:'Architecture Quality',ciDimLabel3:'KPI Reliability',ciFooter:"Claude's self-assessment. Always validate with a technical architect before execution.",ciVerdictGo:'<strong>Recommended: Proceed to solution design.</strong> Analysis quality is sufficient to begin architectural planning.',ciVerdictCaution:'<strong>Proceed with caution.</strong> Validate key assumptions with the client before committing to architecture.',ciVerdictHold:'<strong>Gather more information before proceeding.</strong> Input quality limits analysis reliability.',ciVerdictIcon:{go:'✅',caution:'⚠️',hold:'🔴'},flagOk:'✓',flagWarn:'⚠',flagRisk:'✗',industries:{retail:'Retail & E-commerce',health:'Healthcare & Clinics',legal:'Legal & Compliance',realestate:'Real Estate',logistics:'Logistics & Supply Chain',hr:'Human Resources',marketing:'Marketing & Media',education:'Education',insurance:'Insurance',hospitality:'Hospitality & Travel'}},es:{hdrTag:'Inteligencia de Flujos Pre → Post IA',navPg:'Playground',navAz:'Analizador de Clientes',heroEye:'Transformación de Procesos',heroH1:'Del Proceso Manual<br>a la <em>Arquitectura con IA</em>',heroP:'Selecciona una industria y proceso para ver el estado pre-IA, luego genera el flujo rediseñado.',statInd:'Industrias',statUC:'Casos de Uso',statKPI:'Benchmarks KPI',lblIndustry:'Industria',lblProcess:'Proceso',selInd:'Seleccionar industria',selProc:'Seleccionar proceso',btnRandom:'⇄ Aleatorio',btnGenerate:'⚡ Generar Post-IA',emptyTitle:'Selecciona un caso para comenzar',emptySub:'Elige una industria y proceso arriba, o haz clic en Aleatorio.',ovTitle:'Rediseñando la arquitectura',ovSub:'Aplicando agentes y lógica de automatización',before:'Antes — Estado Pre-IA',after:'Después — Arquitectura con IA',phTxt:'Haz clic en Generar Post-IA para ver la arquitectura',stackTitle:'Tech Stack Recomendado',stackDeploy:'Despliegue: Listo para producción',stackCloud:'Cloud:',stackLayer:'Capa',stackTools:'Herramientas y Frameworks',stackRat:'Justificación',kpiTitle:'Análisis de Impacto en KPIs',kpiSub:'Conservador → Esperado → Mejor en su clase',kpiConserv:'Conservador',kpiExpected:'Esperado',kpiBest:'Mejor en su clase',kpiBaseline:'Baseline pre-IA:',kpiReduce:'▼ Reducir',kpiIncrease:'▲ Aumentar',kpiFooter:'Rangos sintetizados de: McKinsey, BCG/MIT Sloan, Gartner, Accenture (2024–2026).',metTime:'Tiempo ahorrado',metCost:'Impacto en costos',metScale:'Escala',nodeKey:'Clave:',nodeManual:'■ Manual / dolor',nodeAgent:'■ Agente IA',nodeAuto:'■ Automatizado',nodeDec:'◆ Decisión',nodeEnd:'■ Inicio / Fin',trBadge:'PASO 01',trTitle:'Transcript → Mapa de Procesos',trSub:'Pega el transcript de una llamada de descubrimiento para generar un diagrama visual de todos los procesos identificados',trPlaceholder:"Pega el transcript de tu llamada de discovery aquí...\n\nEjemplo: 'Cliente: Recibimos unas 200 facturas al mes por correo. María las imprime, ingresa los datos en Excel...'",btnFlowmap:'Generar Mapa de Procesos',btnClearTr:'Limpiar',trLoadingTitle:'Analizando transcript...',trLoadingSub:'Identificando procesos y mapeando pasos',flowmapTitle:'📊 Mapa de Procesos',btnDownloadFm:'Descargar PNG',fmDragHint:'Arrastra el PNG del mapa a la zona de carga de documentos de abajo para usarlo como input de la arquitectura',azHeroEye:'Análisis Potenciado por IA',azHeroH1:'Carga. Analiza.<br><em>Arquitecta</em> con IA.',azHeroP:'Pega o sube el flujo actual de tu cliente. Claude lo interpretará, generará la arquitectura y evaluará su propia confianza.',azS1L:'Transcript → Mapa',azS2L:'Cargar información',azS3L:'Generar arquitectura',azActionNote:'<strong>Paso 02 — Cargar flujo:</strong> Pega texto, sube un documento o arrastra el PNG del mapa de procesos. Luego completa el contexto y genera la arquitectura.',btnClear:'Limpiar todo',btnAnalyze:'Analizar y Generar',azCardTextLabel:'Descripción del Proceso',azCardTextSub:'Texto / email / notas',azCardFileLabel:'Subir Documento',azCardFileSub:'PDF, Word, imagen, SVG o PNG del mapa',azUploadTxt:'Arrastra aquí o haz clic para buscar',azUploadSub:'PDF · Word · PNG/JPG · SVG · TXT · PNG del mapa',azContextLabel:'Contexto del Cliente',azContextSub:'Opcional pero mejora la calidad',azLblCompany:'Empresa / Nombre del cliente',azLblIndustry:'Industria',azLblScale:'Tamaño del equipo / Escala',azLblPain:'Principal punto de dolor',azErrorTitle:'El análisis falló',azLoadingTitle:'Claude está analizando el flujo de trabajo...',azL1:'Leyendo la descripción del proceso...',azL2:'Mapeando la estructura...',azL3:'Generando arquitectura IA y puntuaciones de confianza...',btnNewAnalysis:'← Nuevo Análisis',azOutSubTpl:' · Transformación Pre → Post IA generada por Claude',azReco:'Recomendaciones Estratégicas',azStackSub:'Cloud:',azKpiTitle:'Análisis de Impacto en KPIs',azKpiSub:'Benchmarks estimados por IA',azKpiFooter:'Estimaciones de Claude. Valida con datos del cliente antes de presentar.',ciTitle:'Confianza del Análisis y Puntuación de Viabilidad',ciSub:'Auto-evaluado por Claude basado en la calidad del input',ciOverallHigh:'CONFIANZA ALTA',ciOverallMed:'CONFIANZA MEDIA',ciOverallLow:'CONFIANZA BAJA',ciDimLabel1:'Comprensión del Input',ciDimLabel2:'Calidad de la Arquitectura',ciDimLabel3:'Fiabilidad de KPIs',ciFooter:'Auto-evaluación de Claude. Valida siempre con un arquitecto técnico antes de ejecutar.',ciVerdictGo:'<strong>Recomendado: Proceder al diseño de solución.</strong> La calidad del análisis es suficiente para comenzar la planificación.',ciVerdictCaution:'<strong>Proceder con precaución.</strong> Valida los supuestos clave con el cliente antes de comprometerse.',ciVerdictHold:'<strong>Recopilar más información antes de proceder.</strong> La calidad del input limita la fiabilidad.',ciVerdictIcon:{go:'✅',caution:'⚠️',hold:'🔴'},flagOk:'✓',flagWarn:'⚠',flagRisk:'✗',industries:{retail:'Retail y E-commerce',health:'Salud y Clínicas',legal:'Legal y Cumplimiento',realestate:'Bienes Raíces',logistics:'Logística y Cadena de Suministro',hr:'Recursos Humanos',marketing:'Marketing y Medios',education:'Educación',insurance:'Seguros',hospitality:'Hospitalidad y Viajes'}}};
+function t(k){return(T[LANG][k]||T.en[k]||k);}
+var C={retail:{l:'Retail & E-commerce',e:'🛍',dept:{returns:{l:'Returns Management',d:'Customer service agents process returns manually across 3 systems, causing 5-day resolution cycles.',tags:['Retail','Customer Service','Operations'],imp:{t:'−85%',c:'−60% cost',s:'24/7'},pre:{t:'Manual Returns Chaos',n:[{t:'start',x:'Customer submits return request'},{t:'pain',x:'Agent receives request manually'},{t:'pain',x:'Searches order across 3 systems'},{t:'decision',x:'Return policy applies?'},{b:[{l:'No',n:[{t:'pain',x:'Manual rejection email'}]},{l:'Yes',n:[{t:'pain',x:'Generates label manually'},{t:'pain',x:'Processes refund (48–72h)'}]}]},{t:'end-node',x:'End — 5 days, customer frustrated'}]},post:{t:'AI-Native Returns Engine',n:[{t:'start',x:'Customer initiates return (chat/web/app)'},{t:'agent',x:'NLP Agent — validates reason & eligibility'},{t:'gain',x:'RAG policy check'},{t:'decision',x:'Eligible?'},{b:[{l:'No',n:[{t:'gain',x:'Personalised alternatives'}]},{l:'Yes',n:[{t:'agent',x:'Fulfilment Agent — label + refund'},{t:'gain',x:'Multi-channel confirmation'}]}]},{t:'end-node',x:'End — Resolved in under 3 minutes'}]}},inventory:{l:'Inventory Replenishment',d:'Buyers place orders from intuition and Excel, creating simultaneous overstock and stockouts.',tags:['Retail','Supply Chain','Forecasting'],imp:{t:'−90%',c:'−40% waste',s:'Automated'},pre:{t:'Gut-Feel Inventory',n:[{t:'start',x:'Weekly inventory review'},{t:'pain',x:'Exports CSV from ERP'},{t:'pain',x:'Analyses by intuition'},{t:'decision',x:'Low stock?'},{b:[{l:'Yes',n:[{t:'pain',x:'Manual email to supplier'}]},{l:'No',n:[{t:'pain',x:'Ignored until stockout'}]}]},{t:'end-node',x:'End — Overstock and stockouts'}]},post:{t:'Autonomous Replenishment',n:[{t:'start',x:'Daily cron 00:00'},{t:'agent',x:'Data Agent — ingests sales, stock, seasonality'},{t:'gain',x:'ML forecast — 30-day demand per SKU'},{t:'agent',x:'Procurement Agent — optimal POs'},{t:'decision',x:'Order > threshold?'},{b:[{l:'Yes',n:[{t:'gain',x:'Human approval via Slack'}]},{l:'No',n:[{t:'gain',x:'Auto-approved → API to supplier'}]}]},{t:'end-node',x:'End — Zero manual intervention'}]}}}},health:{l:'Healthcare & Clinics',e:'🏥',dept:{scheduling:{l:'Appointment Scheduling',d:'Receptionists manage bookings by phone and paper, resulting in 30% no-show rates.',tags:['Healthcare','Operations','CX'],imp:{t:'−75%',c:'−50% no-shows',s:'Continuous'},pre:{t:'Phone-Tag Scheduling',n:[{t:'start',x:'Patient calls clinic'},{t:'pain',x:'Line busy — call fails'},{t:'pain',x:'Receptionist checks paper calendar'},{t:'decision',x:'Slot available?'},{b:[{l:'No',n:[{t:'pain',x:'Manual waitlist'}]},{l:'Yes',n:[{t:'pain',x:'Books in register'},{t:'pain',x:'Manual reminder call'}]}]},{t:'end-node',x:'End — 30% no-show'}]},post:{t:'Conversational AI Scheduling',n:[{t:'start',x:'Patient contacts via WhatsApp/web'},{t:'agent',x:'Chat Agent — captures reason, insurance'},{t:'gain',x:'Real-time availability from HIS'},{t:'agent',x:'Scheduling Agent — optimal slot'},{t:'gain',x:'Instant confirmation + instructions'},{t:'agent',x:'Reminder Agent — WhatsApp 48h + 2h prior'},{t:'end-node',x:'End — 85% attendance, zero admin'}]}},triaje:{l:'Pre-Consultation Triage',d:'Physicians spend 15–20 min per patient reviewing records across 4 systems.',tags:['Healthcare','Clinical','AI Agent'],imp:{t:'−70% prep',c:'3x patients/day',s:'Scalable'},pre:{t:'Manual Pre-Consult Overhead',n:[{t:'start',x:'Patient arrives'},{t:'pain',x:'Logs into 4 systems'},{t:'pain',x:'Reads prior notes manually'},{t:'pain',x:'Cross-checks medications'},{t:'pain',x:'15–20 min prep'},{t:'end-node',x:'End — 10-min consult instead of 30'}]},post:{t:'Clinical Intelligence Briefing',n:[{t:'start',x:'Patient confirms (T-24h)'},{t:'agent',x:'Pre-Visit Agent — synthesises history via RAG'},{t:'gain',x:'Brief: background, meds, flags'},{t:'agent',x:'Scribe Agent — transcribes consult notes'},{t:'end-node',x:'End — Physician 100% focused on patient'}]}}}},legal:{l:'Legal & Compliance',e:'⚖️',dept:{contracts:{l:'Contract Review',d:'Lawyers spend 60% of time on routine contract review with no strategic value.',tags:['Legal','Compliance','AI Agent'],imp:{t:'−80%',c:'−65% spend',s:'Unlimited'},pre:{t:'Manual Contract Review',n:[{t:'start',x:'Contract received'},{t:'pain',x:'Lawyer reads full doc (2–4h)'},{t:'pain',x:'Identifies non-standard clauses'},{t:'pain',x:'Compares against playbook in Word'},{t:'decision',x:'Issues found?'},{b:[{l:'Yes',n:[{t:'pain',x:'Manual redline (days)'}]},{l:'No',n:[{t:'pain',x:'Signs off — risk may be missed'}]}]},{t:'end-node',x:'End — 3–10 days per contract'}]},post:{t:'AI Contract Intelligence',n:[{t:'start',x:'Contract uploaded'},{t:'agent',x:'Extraction Agent — parses clauses'},{t:'agent',x:'Risk Agent — RAG against playbook'},{t:'gain',x:'Risk report with severity scores'},{t:'decision',x:'High-risk clauses?'},{b:[{l:'Yes',n:[{t:'agent',x:'Redline Agent — proposes alternatives'}]},{l:'No',n:[{t:'gain',x:'Auto-routes for e-signature'}]}]},{t:'end-node',x:'End — Reviewed in under 1 hour'}]}},compliance:{l:'Regulatory Monitoring',d:'Compliance officers manually scan sources, covering only 15–30% per week.',tags:['Legal','Compliance','Automation'],imp:{t:'100% coverage',c:'−70% hours',s:'Continuous'},pre:{t:'Manual Regulatory Scanning',n:[{t:'start',x:'Monday — weekly scan begins'},{t:'pain',x:'Reads 10+ sources manually'},{t:'pain',x:'Emails summary (3–5 days)'},{t:'pain',x:'Team assesses impact manually'},{t:'end-node',x:'End — Gaps missed, penalties lurk'}]},post:{t:'Autonomous Compliance Monitor',n:[{t:'start',x:'Cron — every 4 hours'},{t:'agent',x:'Scraper — 100+ regulatory sources'},{t:'agent',x:'Relevance Agent — scores by impact'},{t:'gain',x:'RAG against internal policies'},{t:'decision',x:'Material impact?'},{b:[{l:'Yes',n:[{t:'agent',x:'Alert Agent — notifies CCO'}]},{l:'No',n:[{t:'gain',x:'Logged, audit trail maintained'}]}]},{t:'end-node',x:'End — Zero blind spots'}]}}}},logistics:{l:'Logistics & Supply Chain',e:'🚛',dept:{routing:{l:'Route Optimisation',d:'Dispatchers plan routes manually, unable to react to live traffic or last-minute orders.',tags:['Logistics','Routing','Optimisation'],imp:{t:'−25% fuel',c:'+15% profit',s:'Automated'},pre:{t:'Manual Route Planning',n:[{t:'start',x:'Dispatcher starts at 06:00'},{t:'pain',x:'Assigns stops manually on map'},{t:'pain',x:'No real-time traffic awareness'},{t:'pain',x:'Last-minute changes cause chaos'},{t:'end-node',x:'End — Suboptimal routes, excess fuel'}]},post:{t:'Route Intelligence Engine',n:[{t:'start',x:'Orders locked — optimisation begins'},{t:'agent',x:'Load Agent — optimises fill rates'},{t:'gain',x:'VRP solver — optimal multi-stop routes'},{t:'agent',x:'Live Agent — GPS, traffic, weather'},{t:'decision',x:'Disruption detected?'},{b:[{l:'Yes',n:[{t:'agent',x:'Reroute Agent — recalculates live'}]},{l:'No',n:[{t:'gain',x:'ETAs pushed to recipients'}]}]},{t:'end-node',x:'End — 25% fuel saving, 96% on-time'}]}},customs:{l:'Customs Documentation',d:'Manual customs paperwork causes delays — the largest controllable cost in international freight.',tags:['Logistics','Customs','Document AI'],imp:{t:'−90% errors',c:'Same-day',s:'Any volume'},pre:{t:'Manual Customs Docs',n:[{t:'start',x:'Shipment ready'},{t:'pain',x:'Specialist classifies HS codes manually'},{t:'pain',x:'Fills invoice and packing list'},{t:'pain',x:'Submits via portal — errors rejected'},{t:'decision',x:'Accepted?'},{b:[{l:'No',n:[{t:'pain',x:'Detention $2K–$8K'}]},{l:'Yes',n:[{t:'pain',x:'Manual tracking'}]}]},{t:'end-node',x:'End — 1–3 days with error risk'}]},post:{t:'AI Customs Engine',n:[{t:'start',x:'Order confirmed in TMS'},{t:'agent',x:'Classification Agent — HS codes via RAG'},{t:'agent',x:'Document Agent — generates all docs'},{t:'gain',x:'Validation Agent — destination rules'},{t:'agent',x:'Submission Agent — files via API'},{t:'decision',x:'Query raised?'},{b:[{l:'Yes',n:[{t:'gain',x:'Specialist notified with package'}]},{l:'No',n:[{t:'gain',x:'Cleared — status pushed to all'}]}]},{t:'end-node',x:'End — Same-day, 99.5% accuracy'}]}}}},hr:{l:'Human Resources',e:'👥',dept:{recruiting:{l:'Recruitment & Screening',d:'Recruiters spend 80% of time on CV screening and scheduling AI can handle in seconds.',tags:['HR','Talent','AI Agent'],imp:{t:'−40% time-to-hire',c:'5× capacity',s:'Any volume'},pre:{t:'Manual Recruitment',n:[{t:'start',x:'Job description approved'},{t:'pain',x:'Manually screens 200+ CVs'},{t:'pain',x:'Scheduling emails back-and-forth'},{t:'pain',x:'Answers repetitive FAQs'},{t:'end-node',x:'End — 6 weeks, best candidates elsewhere'}]},post:{t:'AI Talent Pipeline',n:[{t:'start',x:'JD published — pipeline activates'},{t:'agent',x:'Screening Agent — 200 CVs in 1 min'},{t:'agent',x:'Outreach Agent — schedules interviews'},{t:'gain',x:'Async video interview + AI analysis'},{t:'decision',x:'Score > threshold?'},{b:[{l:'Yes',n:[{t:'gain',x:'Sent to hiring manager with scorecard'}]},{l:'No',n:[{t:'agent',x:'Personalised rejection with feedback'}]}]},{t:'end-node',x:'End — Shortlist in 48h'}]}},onboarding:{l:'Employee Onboarding',d:'New hires wait days for access while HR manually coordinates IT, legal, and managers.',tags:['HR','Onboarding','Workflow AI'],imp:{t:'Day-1 ready',c:'−70% admin',s:'Any size'},pre:{t:'Chaotic Manual Onboarding',n:[{t:'start',x:'Offer accepted'},{t:'pain',x:'HR manually emails IT, Facilities, Payroll'},{t:'pain',x:'Wait 3–7 days for laptop and access'},{t:'pain',x:'No structured first-week plan'},{t:'end-node',x:'End — Demoralised hire'}]},post:{t:'Onboarding Orchestrator',n:[{t:'start',x:'Contract signed — auto trigger'},{t:'agent',x:'IT Provisioning — creates all accounts'},{t:'gain',x:'Personalised role-based journey'},{t:'agent',x:'Buddy Agent — 24/7 RAG chatbot'},{t:'agent',x:'Pulse Agent — Day 7, 30, 90 check-ins'},{t:'end-node',x:'End — Day-1 productive, NPS +40 pts'}]}}}},marketing:{l:'Marketing & Media',e:'📣',dept:{content:{l:'Content Production',d:'Marketing teams spend weeks per campaign with no scalable throughput.',tags:['Marketing','Content','Generative AI'],imp:{t:'10× output',c:'−60% cost',s:'Omnichannel'},pre:{t:'Manual Content Factory',n:[{t:'start',x:'Campaign brief approved'},{t:'pain',x:'Copywriter writes copy (2–3 days)'},{t:'pain',x:'Designer creates assets (3–5 days)'},{t:'pain',x:'Manual channel adaptation'},{t:'decision',x:'Brand approval?'},{b:[{l:'No',n:[{t:'pain',x:'Revision rounds — more days'}]},{l:'Yes',n:[{t:'pain',x:'Manual publication per platform'}]}]},{t:'end-node',x:'End — 2–3 weeks per campaign'}]},post:{t:'AI Content Engine',n:[{t:'start',x:'Brief ingested (text or voice)'},{t:'agent',x:'Strategy Agent — audience + landscape'},{t:'agent',x:'Copy Agent — all channels, all variants'},{t:'gain',x:'Brand Guardian — validates guidelines'},{t:'agent',x:'Visual Agent — generates images'},{t:'gain',x:'Human review (30 min)'},{t:'agent',x:'Publishing Agent — all platforms'},{t:'end-node',x:'End — Campaign in 2 hours'}]}},analytics:{l:'Campaign Reporting',d:'Analysts build reports from 6+ platforms weekly — 8 hours of extraction work.',tags:['Marketing','Analytics','BI'],imp:{t:'Real-time',c:'−90% report time',s:'All platforms'},pre:{t:'Manual Reporting',n:[{t:'start',x:'Monday — client wants report'},{t:'pain',x:'Exports CSVs from Meta, Google, TikTok'},{t:'pain',x:'Joins in Excel — errors frequent'},{t:'pain',x:'Builds charts and writes analysis'},{t:'end-node',x:'End — 8h work, ready Wednesday'}]},post:{t:'Unified Analytics Intelligence',n:[{t:'start',x:'Cron — hourly refresh'},{t:'agent',x:'Data Agent — API ingestion all platforms'},{t:'gain',x:'Warehouse — normalises all sources'},{t:'agent',x:'Insight Agent — anomaly detection'},{t:'decision',x:'Anomaly detected?'},{b:[{l:'Yes',n:[{t:'gain',x:'Proactive alert + recommendation'}]},{l:'No',n:[{t:'gain',x:'Automated digest to client'}]}]},{t:'end-node',x:'End — Real-time, zero report effort'}]}}}},education:{l:'Education',e:'🎓',dept:{grading:{l:'Assessment & Feedback',d:'Educators spend days grading — time that should go to teaching and mentoring.',tags:['Education','AI Agent','Personalisation'],imp:{t:'−80% grading',c:'Instant feedback',s:'Unlimited'},pre:{t:'Manual Grading',n:[{t:'start',x:'Students submit work'},{t:'pain',x:'Reads 30–100 submissions'},{t:'pain',x:'Grades against rubric in Excel'},{t:'pain',x:'Writes individual feedback'},{t:'end-node',x:'End — 2-week wait, generic feedback'}]},post:{t:'AI Feedback Loop',n:[{t:'start',x:'Student submits (text/code/essay)'},{t:'agent',x:'Assessment Agent — evaluates vs rubric'},{t:'agent',x:'Feedback Agent — personalised comments'},{t:'gain',x:'Cohort error patterns identified'},{t:'decision',x:'Needs educator intervention?'},{b:[{l:'Yes',n:[{t:'agent',x:'Flags to educator with context'}]},{l:'No',n:[{t:'gain',x:'Feedback in real time'}]}]},{t:'end-node',x:'End — Feedback in under 1h'}]}},admissions:{l:'Admissions Processing',d:'Manual application review with inconsistent criteria and multi-week delays.',tags:['Education','Admissions','Process AI'],imp:{t:'−75%',c:'Objective criteria',s:'Any volume'},pre:{t:'Manual Admissions',n:[{t:'start',x:'Application window opens'},{t:'pain',x:'Coordinator reviews manually'},{t:'pain',x:'Subjective, inconsistent criteria'},{t:'decision',x:'Passes filter?'},{b:[{l:'No',n:[{t:'pain',x:'Delayed rejection'}]},{l:'Yes',n:[{t:'pain',x:'Manual scheduling'},{t:'pain',x:'Committee weeks later'}]}]},{t:'end-node',x:'End — 3 months, candidates enrol elsewhere'}]},post:{t:'Intelligent Admissions Pipeline',n:[{t:'start',x:'Application received'},{t:'agent',x:'Document Agent — extracts full packet'},{t:'agent',x:'Scoring Agent — programme criteria'},{t:'gain',x:'Ranked shortlist, transparent scoring'},{t:'agent',x:'Interview Agent — async video + AI analysis'},{t:'decision',x:'Score > threshold?'},{b:[{l:'Yes',n:[{t:'gain',x:'Admission + enrolment workflow'}]},{l:'No',n:[{t:'agent',x:'Waitlist + personalised feedback'}]}]},{t:'end-node',x:'End — Decisions in 2 weeks'}]}}}},insurance:{l:'Insurance',e:'🛡',dept:{claims:{l:'Claims Processing',d:'Adjusters manage claims manually — 45–90 day cycles, inconsistent fraud detection.',tags:['Insurance','Claims','AI Agent'],imp:{t:'−70%',c:'−40% fraud',s:'Automated'},pre:{t:'Manual Claims',n:[{t:'start',x:'Policyholder reports claim'},{t:'pain',x:'Adjuster opens case manually'},{t:'pain',x:'Requests docs via email'},{t:'pain',x:'Assigns surveyor (1–2 week wait)'},{t:'decision',x:'Coverage applies?'},{b:[{l:'No',n:[{t:'pain',x:'Manual denial letter'}]},{l:'Yes',n:[{t:'pain',x:'Indemnity in Excel'},{t:'pain',x:'Manual payment'}]}]},{t:'end-node',x:'End — 45–90 day cycle'}]},post:{t:'AI Claims Engine',n:[{t:'start',x:'Claim reported (app/web/voice)'},{t:'agent',x:'Intake Agent — extracts, opens file'},{t:'agent',x:'Coverage Agent — RAG on policy'},{t:'agent',x:'Fraud Agent — 200+ signal ML score'},{t:'decision',x:'Fraud risk?'},{b:[{l:'High',n:[{t:'gain',x:'Escalated to SIU with evidence'}]},{l:'Normal',n:[{t:'agent',x:'Valuation Agent — auto indemnity'},{t:'gain',x:'Paid within 24–72h'}]}]},{t:'end-node',x:'End — Simple claims in 24h'}]}},underwriting:{l:'Policy Underwriting',d:'Manual underwriting produces inconsistent decisions that erode portfolio profitability.',tags:['Insurance','Underwriting','Risk AI'],imp:{t:'−80%',c:'Optimal pricing',s:'Consistent'},pre:{t:'Inconsistent Underwriting',n:[{t:'start',x:'Policy application received'},{t:'pain',x:'Collects data manually'},{t:'pain',x:'Queries 3–4 databases'},{t:'pain',x:'Applies subjective criteria'},{t:'decision',x:'Acceptable risk?'},{b:[{l:'No',n:[{t:'pain',x:'Rejection, no explanation'}]},{l:'Yes',n:[{t:'pain',x:'Premium in Excel'},{t:'pain',x:'Manual policy issuance'}]}]},{t:'end-node',x:'End — 5–10 days, inconsistent'}]},post:{t:'AI Underwriting Engine',n:[{t:'start',x:'Application enters system'},{t:'agent',x:'Data Agent — external enrichment'},{t:'agent',x:'Risk Agent — ML, 200+ variables'},{t:'gain',x:'Risk score + SHAP explainability'},{t:'agent',x:'Pricing Agent — optimal premium'},{t:'decision',x:'Risk > threshold?'},{b:[{l:'Yes',n:[{t:'agent',x:'Human review with context'}]},{l:'No',n:[{t:'gain',x:'Auto issuance + digital signature'}]}]},{t:'end-node',x:'End — Hours, consistent, auditable'}]}}}},realestate:{l:'Real Estate',e:'🏢',dept:{leads:{l:'Lead Qualification',d:'Agents follow up cold leads manually, losing hot prospects while wasting time.',tags:['Real Estate','Sales','Lead Gen'],imp:{t:'−95% response',c:'3× conversion',s:'24/7'},pre:{t:'Manual Lead Follow-Up',n:[{t:'start',x:'Lead submits enquiry'},{t:'pain',x:'Agent calls back 4–48h later'},{t:'pain',x:'Manually qualifies: budget, timeline'},{t:'pain',x:'Updates CRM manually'},{t:'decision',x:'Qualified?'},{b:[{l:'No',n:[{t:'pain',x:'Cold lead forgotten'}]},{l:'Yes',n:[{t:'pain',x:'Schedules showing manually'}]}]},{t:'end-node',x:'End — 80% leads lost'}]},post:{t:'AI Lead Engine',n:[{t:'start',x:'Lead submits (any channel)'},{t:'agent',x:'Chat Agent — engages in 30 seconds'},{t:'gain',x:'Structured qualification'},{t:'agent',x:'Scoring Agent — assigns to agent'},{t:'decision',x:'Hot lead?'},{b:[{l:'Yes',n:[{t:'gain',x:'Auto-books showing'}]},{l:'No',n:[{t:'agent',x:'Nurture Agent — 6–18 month sequence'}]}]},{t:'end-node',x:'End — 3× conversion'}]}},docs:{l:'Title Due Diligence',d:'Manual title searches take 2–6 weeks, delaying closings and creating legal risk.',tags:['Real Estate','Legal','Document AI'],imp:{t:'Weeks → Days',c:'−70% legal cost',s:'Any volume'},pre:{t:'Sequential Due Diligence',n:[{t:'start',x:'Purchase agreement signed'},{t:'pain',x:'Lawyer requests title search'},{t:'pain',x:'Reads 200-page report manually'},{t:'pain',x:'Cross-checks lien records'},{t:'end-node',x:'End — 2–6 weeks, last-minute issues'}]},post:{t:'AI Due Diligence Accelerator',n:[{t:'start',x:'Property ID confirmed — search triggered'},{t:'agent',x:'Registry Agent — public records via API'},{t:'agent',x:'Document Agent — extracts risks'},{t:'gain',x:'Risk matrix: liens, easements, gaps'},{t:'decision',x:'Material risk?'},{b:[{l:'Yes',n:[{t:'gain',x:'Attorney review — pre-summarised'}]},{l:'No',n:[{t:'gain',x:'Clean title — ready to close'}]}]},{t:'end-node',x:'End — Due diligence in 48–72h'}]}}}},hospitality:{l:'Hospitality & Travel',e:'🏨',dept:{revenue:{l:'Revenue Management',d:'Revenue managers set rates manually once a day, missing demand spikes.',tags:['Hospitality','Revenue','Pricing AI'],imp:{t:'Real-time',c:'+15% RevPAR',s:'Automated'},pre:{t:'Manual Rate Setting',n:[{t:'start',x:'Morning rate review'},{t:'pain',x:'Checks OTAs manually'},{t:'pain',x:'Compares competitors in spreadsheet'},{t:'pain',x:'Updates rates manually per channel'},{t:'end-node',x:'End — 20–30% revenue left on table'}]},post:{t:'Autonomous Revenue Intelligence',n:[{t:'start',x:'Cron — every hour'},{t:'agent',x:'Market Agent — competitors, OTAs, events'},{t:'agent',x:'Demand Agent — 90-day ML forecast'},{t:'gain',x:'Pricing Engine — optimal rate per type'},{t:'decision',x:'Change > 20%?'},{b:[{l:'Yes',n:[{t:'gain',x:'Manager notified with rationale'}]},{l:'No',n:[{t:'gain',x:'Auto-applied to all channels'}]}]},{t:'end-node',x:'End — +15% RevPAR'}]}},guestexp:{l:'Guest Experience',d:'Staff respond to requests manually, causing delays and inconsistent service.',tags:['Hospitality','CX','Conversational AI'],imp:{t:'under 30 sec',c:'−50% staff load',s:'24/7'},pre:{t:'Reactive Guest Service',n:[{t:'start',x:'Guest has a request'},{t:'pain',x:'Calls reception — line busy'},{t:'pain',x:'Waits 5–20 min'},{t:'pain',x:'Manual internal coordination'},{t:'end-node',x:'End — Low CSAT, negative reviews'}]},post:{t:'AI Guest Orchestrator',n:[{t:'start',x:'Guest contacts via WhatsApp/app/QR'},{t:'agent',x:'Concierge Agent — natural language'},{t:'gain',x:'Full context: history, preferences'},{t:'agent',x:'Task Agent — coordinates internally'},{t:'decision',x:'Outside capacity?'},{b:[{l:'Yes',n:[{t:'agent',x:'Escalates with alternatives'}]},{l:'No',n:[{t:'gain',x:'Resolved without human'}]}]},{t:'end-node',x:'End — NPS +45 pts'}]}}}},};
+var DM_EN={retail:{returns:'Returns Management',inventory:'Inventory Replenishment'},health:{scheduling:'Appointment Scheduling',triaje:'Pre-Consultation Triage'},legal:{contracts:'Contract Review',compliance:'Regulatory Monitoring'},logistics:{routing:'Route Optimisation',customs:'Customs Documentation'},hr:{recruiting:'Recruitment & Screening',onboarding:'Employee Onboarding'},marketing:{content:'Content Production',analytics:'Campaign Reporting'},education:{grading:'Assessment & Feedback',admissions:'Admissions Processing'},insurance:{claims:'Claims Processing',underwriting:'Policy Underwriting'},realestate:{leads:'Lead Qualification',docs:'Title Due Diligence'},hospitality:{revenue:'Revenue Management',guestexp:'Guest Experience'}};
+var DM_ES={retail:{returns:'Gestión de Devoluciones',inventory:'Reabastecimiento de Inventario'},health:{scheduling:'Agendamiento de Citas',triaje:'Triaje Pre-Consulta'},legal:{contracts:'Revisión de Contratos',compliance:'Monitoreo Regulatorio'},logistics:{routing:'Optimización de Rutas',customs:'Documentación Aduanera'},hr:{recruiting:'Reclutamiento y Selección',onboarding:'Onboarding de Empleados'},marketing:{content:'Producción de Contenido',analytics:'Reportes de Campañas'},education:{grading:'Evaluación y Retroalimentación',admissions:'Proceso de Admisiones'},insurance:{claims:'Procesamiento de Siniestros',underwriting:'Suscripción de Pólizas'},realestate:{leads:'Calificación de Leads',docs:'Due Diligence de Título'},hospitality:{revenue:'Gestión de Ingresos',guestexp:'Experiencia del Huésped'}};
+function applyLang(){var L=T[LANG];var ids={hdrTag:'hdrTag',navPgLabel:'navPg',navAzLabel:'navAz',heroEye:'heroEye',heroP:'heroP',statInd:'statInd',statUC:'statUC',statKPI:'statKPI',lblIndustry:'lblIndustry',lblProcess:'lblProcess',emptyTitle:'emptyTitle',emptySub:'emptySub',ovTitle:'ovTitle',azHeroEye:'azHeroEye',azS1L:'azS1L',azS2L:'azS2L',azS3L:'azS3L',azCardTextLabel:'azCardTextLabel',azCardTextSub:'azCardTextSub',azCardFileLabel:'azCardFileLabel',azCardFileSub:'azCardFileSub',azContextLabel:'azContextLabel',azContextSub:'azContextSub',azLblCompany:'azLblCompany',azLblIndustry:'azLblIndustry',azLblScale:'azLblScale',azLblPain:'azLblPain',azErrorTitle:'azErrorTitle',azLoadingTitle:'azLoadingTitle'};Object.keys(ids).forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=L[ids[id]]||L[id]||'';});document.getElementById('heroH1').innerHTML=L.heroH1;document.getElementById('azHeroH1').innerHTML=L.azHeroH1;document.getElementById('azHeroP').textContent=L.azHeroP;document.getElementById('ovSub').innerHTML=L.ovSub;document.getElementById('azActionNote').innerHTML=L.azActionNote;document.getElementById('btnRandom').innerHTML=L.btnRandom;document.getElementById('btnGenerate').innerHTML=L.btnGenerate;document.getElementById('trBadge').textContent=L.trBadge;document.getElementById('trTitle').textContent=L.trTitle;document.getElementById('trSub').textContent=L.trSub;document.getElementById('trText').placeholder=L.trPlaceholder;document.getElementById('btnFlowmapLabel').textContent=L.btnFlowmap;document.getElementById('btnClearTrLabel').textContent=L.btnClearTr;document.getElementById('trLoadingTitle').textContent=L.trLoadingTitle;document.getElementById('trLoadingSub').textContent=L.trLoadingSub;document.getElementById('flowmapTitle').textContent=L.flowmapTitle;document.getElementById('btnDownloadFmLabel').textContent=L.btnDownloadFm;document.getElementById('fmDragHintText').textContent=L.fmDragHint;document.getElementById('btnClearLabel').textContent=L.btnClear;document.getElementById('btnAnalyzeLabel').innerHTML=L.btnAnalyze;document.getElementById('azUploadTxt').textContent=L.azUploadTxt;document.getElementById('azUploadSub').textContent=L.azUploadSub;document.getElementById('btnNewAnalysis').textContent=L.btnNewAnalysis;updateFn();rebuildDropdowns();if(cur){var hasPost=document.getElementById('tswrap').style.display!=='none';if(hasPost)showFull();else showPre();}else document.getElementById('awrap').innerHTML='<div class="empty"><div class="empty-ico">◫</div><div class="empty-title">'+t('emptyTitle')+'</div><div class="empty-sub">'+t('emptySub')+'</div></div>';}
+function setLang(lang){LANG=lang;document.getElementById('btnEN').classList.toggle('active',lang==='en');document.getElementById('btnES').classList.toggle('active',lang==='es');applyLang();}
+function rebuildDropdowns(){var is=document.getElementById('iSel'),ds=document.getElementById('dSel');var ci=is.value,cd=ds.value;is.innerHTML='<option value="">'+t('selInd')+'</option>';Object.keys(C).forEach(function(k){is.innerHTML+='<option value="'+k+'"'+(k===ci?' selected':'')+'>'+t('industries')[k]+'</option>';});ds.innerHTML='<option value="">'+t('selProc')+'</option>';var dm=LANG==='es'?DM_ES:DM_EN;if(ci&&dm[ci])Object.keys(dm[ci]).forEach(function(k){ds.innerHTML+='<option value="'+k+'"'+(k===cd?' selected':'')+'>'+dm[ci][k]+'</option>';});}
+function updateFn(){var fn=document.getElementById('fn');fn.innerHTML=t('nodeKey')+'&nbsp;<span style="color:var(--danger)">'+t('nodeManual')+'</span>&nbsp;·&nbsp;<span style="color:var(--accent)">'+t('nodeAgent')+'</span>&nbsp;·&nbsp;<span style="color:var(--success)">'+t('nodeAuto')+'</span>&nbsp;·&nbsp;<span style="color:var(--amber)">'+t('nodeDec')+'</span>&nbsp;·&nbsp;<span style="color:var(--ink)">'+t('nodeEnd')+'</span>';}
+
+// ===== DYNAMIC KPI DATA =====
+var KPIS = {
+  retail:{
+    returns:[
+      {name:'Resolution Time',direction:'down',unit:'days',preBaseline:'5–7 days',conservative:'1 day',expected:'<3h',bestInClass:'<5 min',barPct:92,note:'AI automation collapses multi-day return cycles to minutes.',source:'McKinsey CX 2024'},
+      {name:'Return Processing Cost',direction:'down',unit:'$/return',preBaseline:'$12–18/return',conservative:'-40%',expected:'-62%',bestInClass:'-78%',barPct:75,note:'Eliminates manual touchpoints and system-hopping.',source:'Gartner Ops AI 2024'},
+      {name:'Customer Satisfaction (CSAT)',direction:'up',unit:'pts',preBaseline:'NPS 28–35',conservative:'+8 pts',expected:'+16 pts',bestInClass:'+24 pts',barPct:68,note:'Instant resolution drives repurchase intent and loyalty.',source:'Forrester CX 2024'},
+      {name:'Return Fraud Rate',direction:'down',unit:'%',preBaseline:'3–5% orders',conservative:'-20%',expected:'-45%',bestInClass:'-65%',barPct:60,note:'ML pattern detection identifies anomalous return behaviour.',source:'NRF Retail 2024'},
+      {name:'Agent Capacity',direction:'up',unit:'cases/day',preBaseline:'40–60/agent',conservative:'3×',expected:'5×',bestInClass:'10×',barPct:80,note:'Agents focus only on exceptions; AI handles routine volume.',source:'Accenture Ops 2024'}
+    ],
+    inventory:[
+      {name:'Forecast Accuracy',direction:'up',unit:'%',preBaseline:'55–65%',conservative:'78%',expected:'88%',bestInClass:'94%',barPct:85,note:'ML demand sensing replaces intuition-based ordering.',source:'McKinsey Supply Chain 2024'},
+      {name:'Stockout Rate',direction:'down',unit:'%',preBaseline:'8–12%',conservative:'-35%',expected:'-65%',bestInClass:'-80%',barPct:78,note:'Predictive restocking eliminates empty shelf events.',source:'BCG Retail AI 2024'},
+      {name:'Excess Inventory (Waste)',direction:'down',unit:'% of stock',preBaseline:'18–25%',conservative:'-30%',expected:'-55%',bestInClass:'-72%',barPct:70,note:'Right-size ordering eliminates both over- and under-stocking.',source:'Gartner SCM 2024'},
+      {name:'Working Capital Freed',direction:'up',unit:'%',preBaseline:'Baseline',conservative:'+8%',expected:'+18%',bestInClass:'+28%',barPct:65,note:'Leaner inventory directly reduces tied-up capital.',source:'McKinsey Finance 2024'},
+      {name:'Order Cycle Time',direction:'down',unit:'days',preBaseline:'5–7 days',conservative:'2 days',expected:'<1 day',bestInClass:'Hours',barPct:88,note:'Automated PO generation cuts cycle time dramatically.',source:'Accenture Supply 2024'}
+    ]
+  },
+  health:{
+    scheduling:[
+      {name:'No-Show Rate',direction:'down',unit:'%',preBaseline:'28–35%',conservative:'-40%',expected:'-65%',bestInClass:'-80%',barPct:82,note:'Multi-channel reminders and friction-free rescheduling eliminate no-shows.',source:'KLAS Research 2024'},
+      {name:'Scheduling Admin Time',direction:'down',unit:'h/day',preBaseline:'3–5h/day',conservative:'-50%',expected:'-75%',bestInClass:'-90%',barPct:88,note:'AI handles 90%+ of routine booking interactions.',source:'McKinsey Healthcare 2024'},
+      {name:'Slot Utilisation',direction:'up',unit:'%',preBaseline:'62–70%',conservative:'78%',expected:'85%',bestInClass:'92%',barPct:74,note:'Smart waitlist and real-time fill maximize capacity.',source:'Advisory Board 2024'},
+      {name:'Patient Satisfaction',direction:'up',unit:'pts',preBaseline:'CAHPS 68',conservative:'+6 pts',expected:'+12 pts',bestInClass:'+18 pts',barPct:60,note:'Frictionless, instant access improves patient experience.',source:'Press Ganey 2024'},
+      {name:'Average Response Time',direction:'down',unit:'min',preBaseline:'15–45 min',conservative:'5 min',expected:'<2 min',bestInClass:'Instant',barPct:92,note:'Automated booking responds instantly via WhatsApp/web.',source:'HIMSS 2024'}
+    ],
+    triaje:[
+      {name:'Pre-Consult Prep Time',direction:'down',unit:'min/patient',preBaseline:'15–20 min',conservative:'5 min',expected:'2 min',bestInClass:'<1 min',barPct:92,note:'AI synthesizes full history; physician reads a brief, not raw notes.',source:'NEJM AI 2024'},
+      {name:'Patients per Physician/Day',direction:'up',unit:'patients',preBaseline:'10–14',conservative:'16',expected:'20',bestInClass:'25+',barPct:78,note:'Eliminating prep overhead unlocks physician capacity.',source:'Advisory Board 2024'},
+      {name:'Medication Error Rate',direction:'down',unit:'%',preBaseline:'3–5%',conservative:'-40%',expected:'-70%',bestInClass:'-85%',barPct:80,note:'AI cross-checks interactions that humans miss under time pressure.',source:'JAMA 2024'},
+      {name:'Documentation Completeness',direction:'up',unit:'%',preBaseline:'60–72%',conservative:'85%',expected:'93%',bestInClass:'98%',barPct:82,note:'AI scribe captures full consult in real time.',source:'HealthLeaders 2024'},
+      {name:'Physician Burnout Index',direction:'down',unit:'score',preBaseline:'High (Maslach)',conservative:'-15%',expected:'-30%',bestInClass:'-45%',barPct:55,note:'Removing admin burden is the #1 driver of physician satisfaction.',source:'AMA 2024'}
+    ]
+  },
+  legal:{
+    contracts:[
+      {name:'Review Time per Contract',direction:'down',unit:'h',preBaseline:'2–4h / contract',conservative:'30 min',expected:'15 min',bestInClass:'<5 min',barPct:94,note:'AI extracts and benchmarks all clauses simultaneously.',source:'Thomson Reuters 2024'},
+      {name:'Legal Spend on Routine Review',direction:'down',unit:'%',preBaseline:'60% of legal budget',conservative:'-40%',expected:'-65%',bestInClass:'-80%',barPct:80,note:'Frees counsel for high-value strategic work.',source:'Gartner Legal 2024'},
+      {name:'Contracts Closed per Month',direction:'up',unit:'×',preBaseline:'Baseline volume',conservative:'2×',expected:'4×',bestInClass:'8×',barPct:72,note:'Removing bottleneck increases throughput without headcount.',source:'Bloomberg Law 2024'},
+      {name:'Risk Clause Detection Rate',direction:'up',unit:'%',preBaseline:'65–75%',conservative:'88%',expected:'94%',bestInClass:'98%',barPct:85,note:'AI misses fewer non-standard clauses than fatigued lawyers.',source:'LexisNexis 2024'},
+      {name:'Avg Days to Execution',direction:'down',unit:'days',preBaseline:'7–14 days',conservative:'3 days',expected:'1 day',bestInClass:'Hours',barPct:90,note:'Instant review + e-signature workflow eliminates calendar drag.',source:'World Commerce 2024'}
+    ],
+    compliance:[
+      {name:'Regulatory Source Coverage',direction:'up',unit:'%',preBaseline:'15–30%/week',conservative:'80%',expected:'95%',bestInClass:'100%',barPct:95,note:'Automated scraping covers all sources; human only reviews alerts.',source:'Deloitte Reg 2024'},
+      {name:'Mean Time to Alert (MTTA)',direction:'down',unit:'days',preBaseline:'5–7 days',conservative:'1 day',expected:'4 hours',bestInClass:'<1 hour',barPct:92,note:'Cron-based monitoring flags material changes same-day.',source:'PwC Compliance 2024'},
+      {name:'Compliance Staff Hours',direction:'down',unit:'h/week',preBaseline:'35–50h/week',conservative:'-50%',expected:'-70%',bestInClass:'-85%',barPct:82,note:'Staff shifts from scanning to reviewing curated alerts.',source:'EY Reg Tech 2024'},
+      {name:'Regulatory Penalty Risk',direction:'down',unit:'%',preBaseline:'High exposure',conservative:'-30%',expected:'-60%',bestInClass:'-85%',barPct:70,note:'Faster alerts enable proactive response before deadlines.',source:'KPMG 2024'},
+      {name:'False Positive Rate',direction:'down',unit:'%',preBaseline:'60–80% alerts',conservative:'-40%',expected:'-65%',bestInClass:'-80%',barPct:65,note:'NLP relevance scoring reduces noise dramatically.',source:'LexisNexis AI 2024'}
+    ]
+  },
+  logistics:{
+    routing:[
+      {name:'Fuel Cost per Route',direction:'down',unit:'%',preBaseline:'Baseline',conservative:'-12%',expected:'-22%',bestInClass:'-30%',barPct:78,note:'VRP optimization and load consolidation cut fuel spend.',source:'McKinsey Logistics 2024'},
+      {name:'On-Time Delivery Rate',direction:'up',unit:'%',preBaseline:'72–80%',conservative:'88%',expected:'94%',bestInClass:'98%',barPct:86,note:'Live rerouting reacts to traffic and exceptions in real time.',source:'Gartner SCM 2024'},
+      {name:'Fleet Utilisation',direction:'up',unit:'%',preBaseline:'55–65%',conservative:'72%',expected:'80%',bestInClass:'88%',barPct:72,note:'AI load optimization fills trucks more efficiently.',source:'BCG Logistics 2024'},
+      {name:'Dispatcher Workload',direction:'down',unit:'routes/day',preBaseline:'40–60 manual',conservative:'-50%',expected:'-75%',bestInClass:'-90%',barPct:88,note:'AI handles routine dispatching; human manages exceptions.',source:'Accenture Ops 2024'},
+      {name:'CO₂ Emissions',direction:'down',unit:'tons/month',preBaseline:'Baseline',conservative:'-10%',expected:'-20%',bestInClass:'-28%',barPct:62,note:'Route efficiency directly reduces carbon footprint.',source:'WEF Logistics 2024'}
+    ],
+    customs:[
+      {name:'Documentation Error Rate',direction:'down',unit:'%',preBaseline:'8–15%',conservative:'-60%',expected:'-85%',bestInClass:'-95%',barPct:92,note:'AI validates against destination rules before submission.',source:'World Customs Org 2024'},
+      {name:'Clearance Time',direction:'down',unit:'days',preBaseline:'1–3 days',conservative:'Same-day',expected:'<4 hours',bestInClass:'<1 hour',barPct:90,note:'Pre-validated docs clear faster with automated submission.',source:'IATA Cargo 2024'},
+      {name:'Detention & Demurrage Cost',direction:'down',unit:'%',preBaseline:'$2K–8K/incident',conservative:'-50%',expected:'-80%',bestInClass:'-95%',barPct:88,note:'Error elimination virtually eliminates detention events.',source:'Sea Intelligence 2024'},
+      {name:'HS Code Accuracy',direction:'up',unit:'%',preBaseline:'82–88%',conservative:'94%',expected:'97%',bestInClass:'99.5%',barPct:85,note:'RAG-powered classification outperforms manual specialist.',source:'WCO Trade Tools 2024'},
+      {name:'Specialist Hours per Shipment',direction:'down',unit:'h',preBaseline:'2–4h',conservative:'20 min',expected:'5 min',bestInClass:'<2 min',barPct:94,note:'AI generates all docs; specialist reviews exceptions only.',source:'Accenture Trade 2024'}
+    ]
+  },
+  hr:{
+    recruiting:[
+      {name:'Time-to-Hire',direction:'down',unit:'weeks',preBaseline:'6–10 weeks',conservative:'4 weeks',expected:'2 weeks',bestInClass:'<1 week',barPct:85,note:'AI pre-screening and async interviews collapse the funnel.',source:'LinkedIn Talent 2024'},
+      {name:'CV Screening Time',direction:'down',unit:'h/role',preBaseline:'15–20h/role',conservative:'1h',expected:'15 min',bestInClass:'2 min',barPct:96,note:'200 CVs processed in under 2 minutes with scoring.',source:'SHRM 2024'},
+      {name:'Cost per Hire',direction:'down',unit:'$',preBaseline:'$4K–12K',conservative:'-30%',expected:'-55%',bestInClass:'-70%',barPct:72,note:'Automation reduces agency reliance and recruiter hours.',source:'NACE 2024'},
+      {name:'Quality of Hire (90-day retention)',direction:'up',unit:'%',preBaseline:'72–78%',conservative:'82%',expected:'88%',bestInClass:'94%',barPct:68,note:'Structured AI scoring reduces bias and improves signal quality.',source:'Harvard Business Review 2024'},
+      {name:'Candidate Experience NPS',direction:'up',unit:'pts',preBaseline:'NPS 12–18',conservative:'+15 pts',expected:'+25 pts',bestInClass:'+38 pts',barPct:65,note:'Fast response and personalised communication drive NPS.',source:'Talent Board 2024'}
+    ],
+    onboarding:[
+      {name:'Days to Productivity',direction:'down',unit:'days',preBaseline:'30–60 days',conservative:'20 days',expected:'14 days',bestInClass:'7 days',barPct:78,note:'Structured role-based journey and instant access accelerate ramp.',source:'Aberdeen HCM 2024'},
+      {name:'IT Provisioning Time',direction:'down',unit:'days',preBaseline:'3–7 days',conservative:'1 day',expected:'Same-day',bestInClass:'<4 hours',barPct:92,note:'Automated account creation removes manual IT bottleneck.',source:'ServiceNow 2024'},
+      {name:'HR Admin Time per Hire',direction:'down',unit:'h',preBaseline:'15–25h',conservative:'-45%',expected:'-70%',bestInClass:'-85%',barPct:82,note:'Orchestration automates coordination across IT, payroll, legal.',source:'Deloitte HCM 2024'},
+      {name:'New Hire 90-Day Retention',direction:'up',unit:'%',preBaseline:'78–84%',conservative:'86%',expected:'91%',bestInClass:'96%',barPct:70,note:'Strong onboarding experience is #1 predictor of early retention.',source:'SHRM 2024'},
+      {name:'New Hire Satisfaction (NPS)',direction:'up',unit:'pts',preBaseline:'NPS 22–30',conservative:'+12 pts',expected:'+22 pts',bestInClass:'+35 pts',barPct:62,note:'Day-1 readiness and buddy support drive immediate satisfaction.',source:'Gallup 2024'}
+    ]
+  },
+  marketing:{
+    content:[
+      {name:'Content Output Volume',direction:'up',unit:'×',preBaseline:'Baseline throughput',conservative:'4×',expected:'8×',bestInClass:'15×',barPct:88,note:'AI generates all channel variants; human reviews and approves.',source:'Forrester Content 2024'},
+      {name:'Campaign Launch Time',direction:'down',unit:'weeks',preBaseline:'2–3 weeks',conservative:'3 days',expected:'1 day',bestInClass:'<4 hours',barPct:90,note:'Parallel generation of copy, visuals, and channel assets.',source:'Gartner Marketing 2024'},
+      {name:'Cost per Piece of Content',direction:'down',unit:'$',preBaseline:'$500–2K',conservative:'-50%',expected:'-70%',bestInClass:'-85%',barPct:82,note:'AI reduces production labor while scaling output.',source:'McKinsey Marketing 2024'},
+      {name:'Brand Guideline Compliance',direction:'up',unit:'%',preBaseline:'72–80%',conservative:'88%',expected:'94%',bestInClass:'99%',barPct:78,note:'Automated brand guardian validates every output before publish.',source:'Bynder DAM 2024'},
+      {name:'Content Engagement Rate',direction:'up',unit:'%',preBaseline:'2–4%',conservative:'+15%',expected:'+35%',bestInClass:'+60%',barPct:58,note:'Audience-tuned variants outperform generic content.',source:'HubSpot 2024'}
+    ],
+    analytics:[
+      {name:'Report Preparation Time',direction:'down',unit:'h',preBaseline:'6–10h/week',conservative:'30 min',expected:'5 min',bestInClass:'Automated',barPct:96,note:'API ingestion and automated synthesis eliminate all manual work.',source:'Gartner BI 2024'},
+      {name:'Data Freshness',direction:'up',unit:'lag',preBaseline:'3–5 days',conservative:'Daily',expected:'Hourly',bestInClass:'Real-time',barPct:92,note:'Continuous pipeline keeps dashboards current.',source:'Tableau 2024'},
+      {name:'Insight Discovery Rate',direction:'up',unit:'%',preBaseline:'Low (manual)',conservative:'+40%',expected:'+75%',bestInClass:'+120%',barPct:70,note:'Anomaly detection surfaces patterns humans would miss.',source:'Databricks 2024'},
+      {name:'Cross-Platform Attribution Accuracy',direction:'up',unit:'%',preBaseline:'55–65%',conservative:'75%',expected:'85%',bestInClass:'93%',barPct:72,note:'Unified data model eliminates multi-platform attribution gaps.',source:'Nielsen Media 2024'},
+      {name:'Client Reporting NPS',direction:'up',unit:'pts',preBaseline:'NPS 30–40',conservative:'+10 pts',expected:'+18 pts',bestInClass:'+28 pts',barPct:60,note:'Real-time dashboards and proactive alerts delight clients.',source:'AgencyAnalytics 2024'}
+    ]
+  },
+  education:{
+    grading:[
+      {name:'Grading Time per Submission',direction:'down',unit:'min',preBaseline:'5–10 min/student',conservative:'1 min',expected:'<30 sec',bestInClass:'Instant',barPct:96,note:'AI evaluates against rubric in seconds at any volume.',source:'EdTech Review 2024'},
+      {name:'Feedback Turnaround',direction:'down',unit:'weeks',preBaseline:'1–2 weeks',conservative:'1 day',expected:'<1 hour',bestInClass:'Instant',barPct:94,note:'Immediate feedback dramatically improves learning retention.',source:'EDUCAUSE 2024'},
+      {name:'Educator Hours on Admin',direction:'down',unit:'h/week',preBaseline:'10–15h/week',conservative:'-50%',expected:'-75%',bestInClass:'-85%',barPct:82,note:'AI handles grading; educator focuses on teaching and mentoring.',source:'Gates Foundation 2024'},
+      {name:'Feedback Personalisation Rate',direction:'up',unit:'%',preBaseline:'20–30%',conservative:'70%',expected:'90%',bestInClass:'100%',barPct:85,note:'Every student receives individually tailored feedback.',source:'MIT Teaching 2024'},
+      {name:'Learning Outcome Improvement',direction:'up',unit:'%',preBaseline:'Baseline',conservative:'+8%',expected:'+18%',bestInClass:'+30%',barPct:58,note:'Faster, personalised feedback loops accelerate mastery.',source:'UNESCO Ed AI 2024'}
+    ],
+    admissions:[
+      {name:'Processing Time per Application',direction:'down',unit:'days',preBaseline:'14–21 days',conservative:'5 days',expected:'2 days',bestInClass:'<1 day',barPct:88,note:'AI extracts and scores all materials instantly.',source:'EAB Enrollment 2024'},
+      {name:'Decision Consistency',direction:'up',unit:'%',preBaseline:'65–75% inter-rater',conservative:'88%',expected:'95%',bestInClass:'99%',barPct:85,note:'Structured scoring eliminates subjective inconsistency.',source:'ACE Research 2024'},
+      {name:'Staff Hours per Application',direction:'down',unit:'h',preBaseline:'2–4h',conservative:'30 min',expected:'10 min',bestInClass:'2 min',barPct:92,note:'Automation handles extraction; staff reviews borderline cases.',source:'NACAC 2024'},
+      {name:'Application-to-Enrolment Rate',direction:'up',unit:'%',preBaseline:'22–28%',conservative:'+5 pts',expected:'+10 pts',bestInClass:'+16 pts',barPct:62,note:'Faster decisions reduce yield loss to competing institutions.',source:'IPEDS 2024'},
+      {name:'Candidate Experience NPS',direction:'up',unit:'pts',preBaseline:'NPS 18–25',conservative:'+10 pts',expected:'+18 pts',bestInClass:'+28 pts',barPct:58,note:'Transparent process and fast communication drive satisfaction.',source:'Ruffalo Noel Levitz 2024'}
+    ]
+  },
+  insurance:{
+    claims:[
+      {name:'Simple Claim Cycle Time',direction:'down',unit:'days',preBaseline:'45–90 days',conservative:'14 days',expected:'3 days',bestInClass:'24 hours',barPct:96,note:'Automated intake, coverage, and valuation compress the cycle.',source:'McKinsey Insurance 2024'},
+      {name:'Fraud Detection Accuracy',direction:'up',unit:'%',preBaseline:'35–50%',conservative:'68%',expected:'82%',bestInClass:'91%',barPct:78,note:'ML on 200+ signals outperforms rule-based detection.',source:'Verisk 2024'},
+      {name:'Claims Processing Cost',direction:'down',unit:'%',preBaseline:'$400–800/claim',conservative:'-30%',expected:'-55%',bestInClass:'-70%',barPct:72,note:'Automation eliminates manual intake and data re-entry.',source:'Gartner Insurance 2024'},
+      {name:'Customer Satisfaction (CSAT)',direction:'up',unit:'pts',preBaseline:'CSAT 62–68',conservative:'+8 pts',expected:'+14 pts',bestInClass:'+20 pts',barPct:65,note:'Fast resolution is the single biggest driver of insurer NPS.',source:'J.D. Power 2024'},
+      {name:'Straight-Through Processing Rate',direction:'up',unit:'%',preBaseline:'20–35%',conservative:'55%',expected:'70%',bestInClass:'85%',barPct:80,note:'More claims resolved without human intervention.',source:'EY Insurance 2024'}
+    ],
+    underwriting:[
+      {name:'Underwriting Decision Time',direction:'down',unit:'days',preBaseline:'5–10 days',conservative:'1 day',expected:'Hours',bestInClass:'Minutes',barPct:94,note:'ML risk scoring and auto-pricing replace sequential manual steps.',source:'BCG Insurance 2024'},
+      {name:'Loss Ratio Improvement',direction:'down',unit:'%',preBaseline:'Baseline',conservative:'-3 pts',expected:'-6 pts',bestInClass:'-10 pts',barPct:62,note:'Better risk selection and pricing precision improve portfolio.',source:'Swiss Re 2024'},
+      {name:'Pricing Accuracy',direction:'up',unit:'%',preBaseline:'72–80%',conservative:'86%',expected:'92%',bestInClass:'97%',barPct:80,note:'200+ variable ML model outperforms actuarial tables alone.',source:'Milliman AI 2024'},
+      {name:'Underwriter Capacity',direction:'up',unit:'×',preBaseline:'Baseline',conservative:'2×',expected:'4×',bestInClass:'7×',barPct:75,note:'AI handles routine risks; underwriters focus on complex cases.',source:'Accenture Insurance 2024'},
+      {name:'Declination Explanation Quality',direction:'up',unit:'score',preBaseline:'Low (subjective)',conservative:'+40%',expected:'+70%',bestInClass:'+90%',barPct:68,note:'SHAP explainability provides clear, auditable rationale.',source:'NAIC RegTech 2024'}
+    ]
+  },
+  realestate:{
+    leads:[
+      {name:'Lead Response Time',direction:'down',unit:'h',preBaseline:'4–48 hours',conservative:'5 min',expected:'30 sec',bestInClass:'Instant',barPct:96,note:'AI Chat Agent engages immediately regardless of time or day.',source:'NAR Technology 2024'},
+      {name:'Lead-to-Showing Conversion',direction:'up',unit:'%',preBaseline:'8–15%',conservative:'20%',expected:'28%',bestInClass:'38%',barPct:72,note:'Fast engagement and qualification before interest cools.',source:'Zillow Group 2024'},
+      {name:'Agent Time on Leads',direction:'down',unit:'h/week',preBaseline:'15–25h/week',conservative:'-50%',expected:'-75%',bestInClass:'-85%',barPct:85,note:'AI qualifies and schedules; agents focus on high-intent buyers.',source:'RE/MAX Research 2024'},
+      {name:'Pipeline Visibility',direction:'up',unit:'%',preBaseline:'45–60%',conservative:'85%',expected:'95%',bestInClass:'100%',barPct:82,note:'Auto CRM updates give real-time pipeline clarity.',source:'Salesforce RE 2024'},
+      {name:'Cost per Qualified Lead',direction:'down',unit:'$',preBaseline:'$180–400',conservative:'-35%',expected:'-55%',bestInClass:'-70%',barPct:70,note:'AI qualification reduces wasted spend on unqualified leads.',source:'BoomTown RE 2024'}
+    ],
+    docs:[
+      {name:'Due Diligence Duration',direction:'down',unit:'weeks',preBaseline:'2–6 weeks',conservative:'1 week',expected:'3 days',bestInClass:'48 hours',barPct:92,note:'Parallel AI agents process all records simultaneously.',source:'ALTA Title 2024'},
+      {name:'Title Issue Detection Rate',direction:'up',unit:'%',preBaseline:'78–85%',conservative:'92%',expected:'97%',bestInClass:'99.5%',barPct:85,note:'AI reads 200-page reports without fatigue or omission.',source:'First American 2024'},
+      {name:'Legal Cost per Transaction',direction:'down',unit:'%',preBaseline:'0.3–0.6% value',conservative:'-30%',expected:'-55%',bestInClass:'-70%',barPct:72,note:'AI does extraction; attorney reviews exception cases only.',source:'ABA PropTech 2024'},
+      {name:'Transaction Fall-Through Rate',direction:'down',unit:'%',preBaseline:'12–18%',conservative:'-25%',expected:'-45%',bestInClass:'-60%',barPct:68,note:'Early issue detection prevents late-stage surprises.',source:'NAR 2024'},
+      {name:'Client Experience Score',direction:'up',unit:'pts',preBaseline:'NPS 35–45',conservative:'+8 pts',expected:'+15 pts',bestInClass:'+22 pts',barPct:62,note:'Transparent, fast process eliminates anxiety.',source:'HomeLight 2024'}
+    ]
+  },
+  hospitality:{
+    revenue:[
+      {name:'RevPAR',direction:'up',unit:'%',preBaseline:'Baseline',conservative:'+8%',expected:'+15%',bestInClass:'+24%',barPct:78,note:'Dynamic pricing captures demand spikes missed by daily manual review.',source:'STR/CoStar 2024'},
+      {name:'ADR (Avg Daily Rate)',direction:'up',unit:'%',preBaseline:'Baseline',conservative:'+5%',expected:'+10%',bestInClass:'+18%',barPct:68,note:'AI identifies optimal rate by segment, channel, and lead time.',source:'IDeaS Revenue 2024'},
+      {name:'Rate Update Frequency',direction:'up',unit:'×/day',preBaseline:'1–2×/day',conservative:'6×',expected:'24×',bestInClass:'Real-time',barPct:92,note:'Automated hourly pricing vs. morning-only manual updates.',source:'Duetto 2024'},
+      {name:'Revenue Manager Hours',direction:'down',unit:'h/week',preBaseline:'30–45h',conservative:'-40%',expected:'-65%',bestInClass:'-80%',barPct:82,note:'Manager shifts to strategy; AI handles tactical pricing.',source:'HSMAI 2024'},
+      {name:'Overbooking/Spoilage Rate',direction:'down',unit:'%',preBaseline:'4–8%',conservative:'-35%',expected:'-60%',bestInClass:'-75%',barPct:70,note:'ML demand forecast dramatically reduces over/underselling.',source:'CBRE Hotels 2024'}
+    ],
+    guestexp:[
+      {name:'Request Response Time',direction:'down',unit:'min',preBaseline:'5–20 min',conservative:'2 min',expected:'<30 sec',bestInClass:'Instant',barPct:94,note:'AI Concierge responds immediately via any channel.',source:'Oracle Hospitality 2024'},
+      {name:'Guest Satisfaction (GSS)',direction:'up',unit:'pts',preBaseline:'GSS 72–78',conservative:'+5 pts',expected:'+12 pts',bestInClass:'+18 pts',barPct:68,note:'Proactive, personalised service drives review scores.',source:'J.D. Power Hotels 2024'},
+      {name:'Front Desk Staff Workload',direction:'down',unit:'%',preBaseline:'Baseline',conservative:'-30%',expected:'-50%',bestInClass:'-65%',barPct:72,note:'AI handles 60–80% of requests without human escalation.',source:'Hapi Hotel Tech 2024'},
+      {name:'Upsell Revenue per Stay',direction:'up',unit:'%',preBaseline:'Baseline',conservative:'+15%',expected:'+28%',bestInClass:'+45%',barPct:65,note:'AI identifies upsell moments based on guest profile and stay context.',source:'IHG Revenue 2024'},
+      {name:'TripAdvisor / Review Score',direction:'up',unit:'pts',preBaseline:'4.0–4.2',conservative:'4.3',expected:'4.5',bestInClass:'4.7+',barPct:60,note:'Service quality improvements translate directly to online reputation.',source:'ReviewPro 2024'}
+    ]
+  }
+};
+
+// ===== DYNAMIC TECH STACK DATA =====
+var STACKS = {
+  retail:{
+    returns:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','Amazon Comprehend'],rat:'Intent classification and multi-turn resolution dialogue.',type:'ai'},
+      {cat:'Orchestration',tools:['LangChain','Step Functions'],rat:'Stateful return workflow orchestration across systems.',type:'frame'},
+      {cat:'Integrations',tools:['Shopify API','ERP Connector','Stripe'],rat:'Unified order lookup and refund execution across 3 systems.',type:'int'},
+      {cat:'Database',tools:['DynamoDB','Redis'],rat:'Order state and session management at scale.',type:'db'},
+      {cat:'Infrastructure',tools:['Lambda','SQS','EventBridge'],rat:'Event-driven, serverless async processing.',type:'infra'}
+    ]},
+    inventory:{cloud:'GCP',rows:[
+      {cat:'AI/ML',tools:['Vertex AI','BigQuery ML','Claude claude-sonnet-4-6'],rat:'Demand forecasting with LLM-enhanced seasonality reasoning.',type:'ai'},
+      {cat:'Data Pipeline',tools:['Cloud Dataflow','Pub/Sub'],rat:'Real-time ingestion from ERP, POS, and supplier feeds.',type:'frame'},
+      {cat:'Database',tools:['BigQuery','Firestore'],rat:'OLAP for forecasting; OLTP for real-time stock state.',type:'db'},
+      {cat:'Integration',tools:['EDI Gateway','Supplier APIs'],rat:'Automated PO submission to supplier systems.',type:'int'},
+      {cat:'Infrastructure',tools:['Cloud Run','Cloud Scheduler'],rat:'Scheduled cron jobs and containerized ML inference.',type:'infra'}
+    ]}
+  },
+  health:{
+    scheduling:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','Azure OpenAI'],rat:'Conversational booking and intent extraction in natural language.',type:'ai'},
+      {cat:'Integrations',tools:['HL7 FHIR API','WhatsApp Business','Twilio'],rat:'Real-time HIS availability and multi-channel patient communication.',type:'int'},
+      {cat:'Orchestration',tools:['LangGraph','Azure Logic Apps'],rat:'Multi-step booking workflow with waitlist and reminder logic.',type:'frame'},
+      {cat:'Database',tools:['Azure SQL','Cosmos DB'],rat:'Structured appointment data; flexible session state.',type:'db'},
+      {cat:'Infrastructure',tools:['Azure Functions','Service Bus'],rat:'Event-driven reminders and booking confirmations.',type:'infra'}
+    ]},
+    triaje:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','Whisper (OpenAI)'],rat:'Clinical summary synthesis and real-time transcription.',type:'ai'},
+      {cat:'Clinical Data',tools:['HL7 FHIR','SNOMED CT RAG'],rat:'Structured clinical history retrieval and terminology reasoning.',type:'int'},
+      {cat:'Vector Store',tools:['Pinecone','pgvector'],rat:'Semantic search over patient records and clinical guidelines.',type:'db'},
+      {cat:'Frameworks',tools:['LangChain','FastAPI'],rat:'RAG pipeline and clinical briefing generation.',type:'frame'},
+      {cat:'Infrastructure',tools:['ECS Fargate','KMS Encryption'],rat:'HIPAA-compliant containerized inference with encryption at rest.',type:'infra'}
+    ]}
+  },
+  legal:{
+    contracts:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','GPT-4o'],rat:'Long-context document analysis and clause-level reasoning.',type:'ai'},
+      {cat:'Document Processing',tools:['Azure Form Recognizer','pdfminer'],rat:'Extraction and parsing of multi-format contract documents.',type:'int'},
+      {cat:'Vector Store',tools:['Azure AI Search','Chroma'],rat:'RAG over legal playbooks and precedent library.',type:'db'},
+      {cat:'Frameworks',tools:['LangGraph','FastAPI'],rat:'Multi-agent review pipeline with redline generation step.',type:'frame'},
+      {cat:'Infrastructure',tools:['Azure Functions','Blob Storage'],rat:'Serverless processing with secure document storage.',type:'infra'}
+    ]},
+    compliance:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Relevance scoring, impact assessment, and policy gap analysis.',type:'ai'},
+      {cat:'Data Ingestion',tools:['Scrapy','RSS/Atom Feeds','Firecrawl'],rat:'Automated crawling of 100+ regulatory sources.',type:'int'},
+      {cat:'Vector Store',tools:['Weaviate','pgvector'],rat:'Semantic matching of alerts against internal policies.',type:'db'},
+      {cat:'Frameworks',tools:['Airflow','LangChain'],rat:'Scheduled pipeline orchestration and RAG retrieval.',type:'frame'},
+      {cat:'Infrastructure',tools:['Lambda','SNS','S3'],rat:'Event-driven alert distribution and audit trail storage.',type:'infra'}
+    ]}
+  },
+  logistics:{
+    routing:{cloud:'AWS',rows:[
+      {cat:'Optimization',tools:['OR-Tools','Google Maps API'],rat:'VRP solving with real-time constraints and multi-stop optimization.',type:'ai'},
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Exception reasoning and dispatcher communication.',type:'ai'},
+      {cat:'Real-Time Data',tools:['HERE Traffic API','OpenWeather'],rat:'Live traffic, incidents, and weather for dynamic rerouting.',type:'int'},
+      {cat:'Database',tools:['PostgreSQL + PostGIS','Redis'],rat:'Geospatial route data and real-time GPS state.',type:'db'},
+      {cat:'Infrastructure',tools:['ECS','Kinesis'],rat:'Streaming GPS events and containerized optimization engine.',type:'infra'}
+    ]},
+    customs:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'HS code classification, document generation, and query response.',type:'ai'},
+      {cat:'Document Processing',tools:['Azure Form Recognizer','Tesseract OCR'],rat:'Extraction from commercial invoices and packing lists.',type:'int'},
+      {cat:'Classification RAG',tools:['WCO HS Database','Azure AI Search'],rat:'Semantic search over 5,000+ HS code descriptions.',type:'db'},
+      {cat:'Submission',tools:['Customs APIs (CBP/SAT/ADUANAS)'],rat:'Direct electronic filing to destination customs systems.',type:'int'},
+      {cat:'Infrastructure',tools:['Azure Functions','Service Bus'],rat:'Async document processing and submission queue.',type:'infra'}
+    ]}
+  },
+  hr:{
+    recruiting:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'CV scoring, structured interview analysis, and candidate feedback.',type:'ai'},
+      {cat:'Integrations',tools:['LinkedIn API','Greenhouse ATS','Calendly'],rat:'Sourcing, ATS sync, and automated interview scheduling.',type:'int'},
+      {cat:'Video AI',tools:['Hume AI','AssemblyAI'],rat:'Async video interview transcription and sentiment analysis.',type:'frame'},
+      {cat:'Database',tools:['PostgreSQL','Pinecone'],rat:'Structured candidate data and JD-to-CV semantic matching.',type:'db'},
+      {cat:'Infrastructure',tools:['Lambda','SQS'],rat:'Async CV processing queue and event-driven notifications.',type:'infra'}
+    ]},
+    onboarding:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Buddy chatbot (RAG), personalised journey generation, pulse analysis.',type:'ai'},
+      {cat:'Integrations',tools:['Azure AD','Workday','ServiceNow'],rat:'Automated IT provisioning and HR system orchestration.',type:'int'},
+      {cat:'Content',tools:['SharePoint','Notion API'],rat:'Role-based onboarding content delivery and tracking.',type:'frame'},
+      {cat:'Database',tools:['Azure SQL','Cosmos DB'],rat:'Onboarding state machine and employee profile data.',type:'db'},
+      {cat:'Infrastructure',tools:['Azure Functions','Logic Apps'],rat:'Triggered workflows on hire event, Day 7, 30, 90 pulses.',type:'infra'}
+    ]}
+  },
+  marketing:{
+    content:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','DALL-E 3','Runway'],rat:'Copy generation, brand validation, and image/video creation.',type:'ai'},
+      {cat:'Orchestration',tools:['LangGraph','n8n'],rat:'Multi-agent content pipeline from brief to publication.',type:'frame'},
+      {cat:'Integrations',tools:['Meta API','Google Ads API','HubSpot'],rat:'Direct publication to all channels without manual export.',type:'int'},
+      {cat:'Brand Knowledge',tools:['Pinecone','pgvector'],rat:'RAG over brand guidelines and approved content library.',type:'db'},
+      {cat:'Infrastructure',tools:['Lambda','S3','CloudFront'],rat:'Serverless processing and asset CDN delivery.',type:'infra'}
+    ]},
+    analytics:{cloud:'GCP',rows:[
+      {cat:'Data Ingestion',tools:['Airbyte','Fivetran','Meta/Google APIs'],rat:'Automated extraction from all ad platforms and CRMs.',type:'int'},
+      {cat:'Warehouse',tools:['BigQuery','dbt'],rat:'Unified data model normalizing cross-platform metrics.',type:'db'},
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6','Vertex AI'],rat:'Anomaly detection, narrative generation, and insight synthesis.',type:'ai'},
+      {cat:'Visualization',tools:['Looker','Data Studio'],rat:'Real-time dashboards and automated client digests.',type:'frame'},
+      {cat:'Infrastructure',tools:['Cloud Run','Cloud Scheduler'],rat:'Scheduled pipeline runs and containerized inference.',type:'infra'}
+    ]}
+  },
+  education:{
+    grading:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Rubric-based evaluation, personalised feedback, cohort pattern analysis.',type:'ai'},
+      {cat:'Integrations',tools:['Canvas LMS API','Google Classroom','Turnitin'],rat:'Direct submission intake from all major LMS platforms.',type:'int'},
+      {cat:'Code Evaluation',tools:['Judge0','CodeSandbox API'],rat:'Sandboxed execution and evaluation of programming assignments.',type:'frame'},
+      {cat:'Database',tools:['PostgreSQL','S3'],rat:'Submission storage, rubric versioning, and audit trail.',type:'db'},
+      {cat:'Infrastructure',tools:['Lambda','SQS'],rat:'Async grading queue handling concurrent submission bursts.',type:'infra'}
+    ]},
+    admissions:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Document extraction, scoring, async interview analysis.',type:'ai'},
+      {cat:'Document Processing',tools:['Azure Form Recognizer','Tesseract'],rat:'Transcript, essay, and recommendation letter extraction.',type:'int'},
+      {cat:'Video AI',tools:['AssemblyAI','Azure Video Indexer'],rat:'Async video interview transcription and structured analysis.',type:'frame'},
+      {cat:'Database',tools:['Azure SQL','Azure Blob'],rat:'Application state machine and document storage.',type:'db'},
+      {cat:'Infrastructure',tools:['Azure Functions','Logic Apps'],rat:'Triggered workflows on application events and decisions.',type:'infra'}
+    ]}
+  },
+  insurance:{
+    claims:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Coverage analysis, fraud reasoning, valuation, and communication.',type:'ai'},
+      {cat:'Fraud ML',tools:['SageMaker','XGBoost'],rat:'200+ signal fraud scoring with ML model trained on claims history.',type:'ai'},
+      {cat:'Integrations',tools:['Core Policy API','ISO ClaimSearch','LexisNexis'],rat:'Policy lookup, fraud database checks, and enrichment.',type:'int'},
+      {cat:'Database',tools:['Aurora PostgreSQL','DynamoDB'],rat:'Claims state machine and document storage.',type:'db'},
+      {cat:'Infrastructure',tools:['Step Functions','SNS','S3'],rat:'Claim workflow orchestration, notifications, and audit storage.',type:'infra'}
+    ]},
+    underwriting:{cloud:'AWS',rows:[
+      {cat:'AI/ML',tools:['SageMaker','XGBoost','SHAP'],rat:'200+ variable risk scoring with explainability for regulatory compliance.',type:'ai'},
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Unstructured data extraction, risk narration, and exception handling.',type:'ai'},
+      {cat:'Data Enrichment',tools:['LexisNexis Risk','Verisk Analytics','ISO'],rat:'External data enrichment for risk profiling.',type:'int'},
+      {cat:'Database',tools:['Redshift','RDS PostgreSQL'],rat:'OLAP for model training; OLTP for policy state.',type:'db'},
+      {cat:'Infrastructure',tools:['SageMaker Endpoints','Lambda'],rat:'Real-time inference endpoints and serverless orchestration.',type:'infra'}
+    ]}
+  },
+  realestate:{
+    leads:{cloud:'AWS',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Lead qualification dialogue, scoring rationale, and nurture sequences.',type:'ai'},
+      {cat:'Integrations',tools:['Salesforce CRM','WhatsApp Business','Calendly'],rat:'Real-time CRM updates and multi-channel engagement.',type:'int'},
+      {cat:'Lead Data',tools:['Clearbit','ZoomInfo'],rat:'Enrichment for faster qualification with external data.',type:'frame'},
+      {cat:'Database',tools:['PostgreSQL','Redis'],rat:'Lead state machine and session management.',type:'db'},
+      {cat:'Infrastructure',tools:['Lambda','SQS','EventBridge'],rat:'Event-driven workflow on lead activity signals.',type:'infra'}
+    ]},
+    docs:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Document synthesis, risk identification, and attorney briefing.',type:'ai'},
+      {cat:'Document Processing',tools:['Azure Form Recognizer','OCR'],rat:'Parsing of title reports, deeds, and lien records.',type:'int'},
+      {cat:'Public Records',tools:['ATTOM Data','County Registry APIs'],rat:'Direct integration with public property records systems.',type:'frame'},
+      {cat:'Database',tools:['Azure SQL','Blob Storage'],rat:'Transaction state, risk matrices, and document archive.',type:'db'},
+      {cat:'Infrastructure',tools:['Azure Functions','Logic Apps'],rat:'Parallel document processing and attorney notification triggers.',type:'infra'}
+    ]}
+  },
+  hospitality:{
+    revenue:{cloud:'AWS',rows:[
+      {cat:'AI/ML',tools:['SageMaker','Forecast'],rat:'90-day demand forecasting with event and seasonality awareness.',type:'ai'},
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Pricing rationale generation and manager communication.',type:'ai'},
+      {cat:'Market Data',tools:['OTA Insight','RateGain','STR'],rat:'Competitor rates, market demand, and review sentiment.',type:'int'},
+      {cat:'Distribution',tools:['Channel Manager API','PMS Integration'],rat:'Rate updates pushed to all OTAs and direct booking engine.',type:'int'},
+      {cat:'Infrastructure',tools:['Lambda','EventBridge','DynamoDB'],rat:'Hourly scheduled pricing jobs and event-driven updates.',type:'infra'}
+    ]},
+    guestexp:{cloud:'Azure',rows:[
+      {cat:'AI/LLM',tools:['Claude claude-sonnet-4-6'],rat:'Natural language concierge, upsell recommendations, and escalation routing.',type:'ai'},
+      {cat:'Integrations',tools:['WhatsApp Business','Opera PMS','Hotsos'],rat:'Guest profile enrichment and internal task routing.',type:'int'},
+      {cat:'Guest Knowledge',tools:['Azure AI Search','Pinecone'],rat:'RAG over hotel services, local info, and guest preferences.',type:'db'},
+      {cat:'Frameworks',tools:['LangGraph','FastAPI'],rat:'Multi-turn concierge agent with memory and task delegation.',type:'frame'},
+      {cat:'Infrastructure',tools:['Azure Functions','Service Bus'],rat:'Event-driven internal task routing and escalation workflows.',type:'infra'}
+    ]}
+  }
+};
+
+var cur=null;
+document.getElementById('iSel').addEventListener('change',function(){var ind=this.value,ds=document.getElementById('dSel');ds.innerHTML='<option value="">'+t('selProc')+'</option>';var dm=LANG==='es'?DM_ES:DM_EN;if(ind&&dm[ind])Object.keys(dm[ind]).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=dm[ind][k];ds.appendChild(o);});reset();});
+document.getElementById('dSel').addEventListener('change',function(){var ind=document.getElementById('iSel').value,dept=this.value;if(ind&&dept&&C[ind]&&C[ind].dept[dept]){cur={ind:ind,dept:dept,d:C[ind].dept[dept]};showPre();}});
+function reset(){cur=null;['cstrip','fn','tswrap','kpiwrap'].forEach(function(id){document.getElementById(id).style.display='none';});document.getElementById('awrap').innerHTML='<div class="empty"><div class="empty-ico">◫</div><div class="empty-title">'+t('emptyTitle')+'</div><div class="empty-sub">'+t('emptySub')+'</div></div>';}
+function stripEl(d,ind,sm){var id=C[ind];var mv=sm?'<div class="met"><div class="met-v">'+d.imp.t+'</div><div class="met-l">'+t('metTime')+'</div></div><div class="met-d"></div><div class="met"><div class="met-v">'+d.imp.c+'</div><div class="met-l">'+t('metCost')+'</div></div><div class="met-d"></div><div class="met"><div class="met-v">'+d.imp.s+'</div><div class="met-l">'+t('metScale')+'</div></div>':'<div class="met"><div class="met-v" style="color:var(--ink-4)">—</div><div class="met-l">'+t('metTime')+'</div></div><div class="met-d"></div><div class="met"><div class="met-v" style="color:var(--ink-4)">—</div><div class="met-l">'+t('metCost')+'</div></div><div class="met-d"></div><div class="met"><div class="met-v" style="color:var(--ink-4)">—</div><div class="met-l">'+t('metScale')+'</div></div>';var tags=d.tags.map(function(tg,i){return'<span class="tag '+['ta','tb','tc'][i]+'">'+tg+'</span>';}).join('');return'<div class="cs-ico">'+id.e+'</div><div class="cs-body"><div class="cs-kicker">'+id.l+'</div><div class="cs-title">'+d.l+'</div><div class="cs-desc">'+d.d+'</div><div class="cs-tags">'+tags+'</div></div><div class="cs-met">'+mv+'</div>';}
+function showPre(){var d=cur.d,ind=cur.ind;var cs=document.getElementById('cstrip');cs.style.display='grid';cs.className='cs';cs.innerHTML=stripEl(d,ind,false);document.getElementById('fn').style.display='none';document.getElementById('tswrap').style.display='none';document.getElementById('kpiwrap').style.display='none';var impT=d.imp.t||'—',impC=d.imp.c||'—',impS=d.imp.s||'—';
+var isDown=function(v){return v.indexOf('−')!==-1||v.indexOf('-')!==-1;};
+document.getElementById('awrap').innerHTML='<div class="impact-strip"><div class="impact-cell"><div class="impact-arrow '+(isDown(impT)?'impact-arrow-down':'impact-arrow-up')+'">'+(isDown(impT)?'▼ REDUCTION':'▲ IMPROVEMENT')+'</div><div class="impact-val impact-val-accent">'+impT+'</div><div class="impact-label">'+t('metTime')+'</div></div><div class="impact-cell"><div class="impact-arrow '+(isDown(impC)?'impact-arrow-down':'impact-arrow-up')+'">'+(isDown(impC)?'▼ REDUCTION':'▲ IMPROVEMENT')+'</div><div class="impact-val impact-val-accent">'+impC+'</div><div class="impact-label">'+t('metCost')+'</div></div><div class="impact-cell"><div class="impact-arrow impact-arrow-up">▲ CAPABILITY</div><div class="impact-val" style="font-size:22px;padding-top:4px">'+impS+'</div><div class="impact-label">'+t('metScale')+'</div></div></div><div class="ag"><div class="ap"><div class="ap-head"><div class="ap-lbl"><div class="ld ld-b"></div>'+t('before')+'</div><div class="ap-sub">'+d.pre.t+'</div></div><div class="ab"><div class="flow">'+flowHtml(d.pre.n,false)+'</div></div></div><div class="ap ph"><div class="ph-icon">⚡</div><div class="ph-txt">'+t('phTxt')+'</div></div></div>';}
+function generate(){if(!cur){randomize();return;}document.getElementById('ov').classList.add('show');setTimeout(function(){document.getElementById('ov').classList.remove('show');showFull();},1800);}
+function showFull(){var d=cur.d,ind=cur.ind,dept=cur.dept;var cs=document.getElementById('cstrip');cs.style.display='grid';cs.className='cs';cs.innerHTML=stripEl(d,ind,true);document.getElementById('awrap').innerHTML='<div class="ag"><div class="ap"><div class="ap-head"><div class="ap-lbl"><div class="ld ld-b"></div>'+t('before')+'</div><div class="ap-sub">'+d.pre.t+'</div></div><div class="ab"><div class="flow">'+flowHtml(d.pre.n,false)+'</div></div></div><div class="ap"><div class="ap-head" style="background:#f0faf6;border-bottom-color:#c8eadd"><div class="ap-lbl"><div class="ld ld-a"></div>'+t('after')+'</div><div class="ap-sub">'+d.post.t+'</div></div><div class="ab"><div class="flow">'+flowHtml(d.post.n,true)+'</div></div></div></div>';var stk=STACKS[ind]&&STACKS[ind][dept]?STACKS[ind][dept]:null;document.getElementById('tswrap').style.display='block';if(stk){var srows=stk.rows.map(function(row){var tools=row.tools.map(function(tool){return'<span class="chip chip-'+row.type+'">'+tool+'</span>';}).join('');return'<tr><td style="width:130px"><span class="ts-cat">'+row.cat+'</span></td><td><div class="ts-tools">'+tools+'</div></td><td><span class="ts-note">'+row.rat+'</span></td></tr>';}).join('');document.getElementById('tswrap').innerHTML='<div class="ts-wrap"><div class="ts-head"><div class="ts-title">'+t('stackTitle')+'</div><div class="ts-sub">'+t('stackCloud')+' '+stk.cloud+' · '+t('stackDeploy')+'</div></div><table class="ts-table"><thead><tr><th>'+t('stackLayer')+'</th><th>'+t('stackTools')+'</th><th>'+t('stackRat')+'</th></tr></thead><tbody>'+srows+'</tbody></table></div>';}else{document.getElementById('tswrap').innerHTML='<div class="ts-wrap"><div class="ts-head"><div class="ts-title">'+t('stackTitle')+'</div><div class="ts-sub">'+t('stackCloud')+' AWS · '+t('stackDeploy')+'</div></div><table class="ts-table"><thead><tr><th>'+t('stackLayer')+'</th><th>'+t('stackTools')+'</th><th>'+t('stackRat')+'</th></tr></thead><tbody><tr><td><span class="ts-cat">AI/LLM</span></td><td><div class="ts-tools"><span class="chip chip-ai">Claude claude-sonnet-4-6</span><span class="chip chip-ai">LangChain</span></div></td><td><span class="ts-note">LLM for reasoning and RAG.</span></td></tr><tr><td><span class="ts-cat">Frameworks</span></td><td><div class="ts-tools"><span class="chip chip-frame">FastAPI</span><span class="chip chip-frame">LangGraph</span></div></td><td><span class="ts-note">Agent orchestration.</span></td></tr><tr><td><span class="ts-cat">Database</span></td><td><div class="ts-tools"><span class="chip chip-db">PostgreSQL</span><span class="chip chip-db">Pinecone</span></div></td><td><span class="ts-note">Vector store + RDBMS.</span></td></tr><tr><td><span class="ts-cat">Infra</span></td><td><div class="ts-tools"><span class="chip chip-infra">Lambda</span><span class="chip chip-infra">SQS</span></div></td><td><span class="ts-note">Serverless async processing.</span></td></tr></tbody></table></div>';}var kd=KPIS[ind]&&KPIS[ind][dept]?KPIS[ind][dept]:null;document.getElementById('kpiwrap').style.display='block';if(kd){var kcards=kd.map(function(k){var isD=k.direction==='down';return'<div class="kpi-card"><div class="kpi-card-head"><div class="kpi-name">'+k.name+'</div><div class="kpi-dir '+(isD?'kpi-dir-down':'kpi-dir-up')+'">'+(isD?t('kpiReduce'):t('kpiIncrease'))+'</div></div><div class="kpi-bar-track"><div class="kpi-bar-fill '+(isD?'kpi-bar-green':'kpi-bar-blue')+'" style="width:'+(k.barPct||70)+'%"></div></div><div class="kpi-ranges"><div><div class="kpi-range-label">'+t('kpiConserv')+'</div><div class="kpi-range-val mid">'+k.conservative+'</div></div><div><div class="kpi-range-label">'+t('kpiExpected')+'</div><div class="kpi-range-val good">'+k.expected+'</div></div><div><div class="kpi-range-label">'+t('kpiBest')+'</div><div class="kpi-range-val" style="color:var(--accent)">'+k.bestInClass+'</div></div></div><div class="kpi-baseline-row"><div class="kpi-baseline-label">'+t('kpiBaseline')+'</div><div class="kpi-baseline-val">'+k.preBaseline+'</div></div><div class="kpi-note">'+k.note+'</div><div class="kpi-source">'+k.source+'</div></div>';}).join('');document.getElementById('kpiwrap').innerHTML='<div class="kpi-wrap"><div class="kpi-section-head"><div class="kpi-section-title">'+t('kpiTitle')+'</div><div class="kpi-section-sub">'+t('kpiSub')+'</div></div><div class="kpi-grid kpi-grid-5">'+kcards+'</div><div class="kpi-footer"><div class="kpi-footer-dot"></div>'+t('kpiFooter')+'</div></div>';}else{document.getElementById('kpiwrap').innerHTML='<div class="kpi-wrap"><div class="kpi-section-head"><div class="kpi-section-title">'+t('kpiTitle')+'</div><div class="kpi-section-sub">'+t('kpiSub')+'</div></div><div class="kpi-grid"><div class="kpi-card"><div class="kpi-card-head"><div class="kpi-name">Resolution Time</div><div class="kpi-dir kpi-dir-down">'+t('kpiReduce')+'</div></div><div class="kpi-bar-track"><div class="kpi-bar-fill kpi-bar-green" style="width:88%"></div></div><div class="kpi-ranges"><div><div class="kpi-range-label">'+t('kpiConserv')+'</div><div class="kpi-range-val mid">1 day</div></div><div><div class="kpi-range-label">'+t('kpiExpected')+'</div><div class="kpi-range-val good">&lt;3h</div></div><div><div class="kpi-range-label">'+t('kpiBest')+'</div><div class="kpi-range-val" style="color:var(--accent)">&lt;5 min</div></div></div><div class="kpi-baseline-row"><div class="kpi-baseline-label">'+t('kpiBaseline')+'</div><div class="kpi-baseline-val">5–7 days</div></div><div class="kpi-note">AI automation collapses multi-day cycles.</div><div class="kpi-source">McKinsey Ops AI 2024</div></div><div class="kpi-card"><div class="kpi-card-head"><div class="kpi-name">Cost per Transaction</div><div class="kpi-dir kpi-dir-down">'+t('kpiReduce')+'</div></div><div class="kpi-bar-track"><div class="kpi-bar-fill kpi-bar-green" style="width:72%"></div></div><div class="kpi-ranges"><div><div class="kpi-range-label">'+t('kpiConserv')+'</div><div class="kpi-range-val mid">−40%</div></div><div><div class="kpi-range-label">'+t('kpiExpected')+'</div><div class="kpi-range-val good">−60%</div></div><div><div class="kpi-range-label">'+t('kpiBest')+'</div><div class="kpi-range-val" style="color:var(--accent)">−75%</div></div></div><div class="kpi-baseline-row"><div class="kpi-baseline-label">'+t('kpiBaseline')+'</div><div class="kpi-baseline-val">$12–18/case</div></div><div class="kpi-note">Automation eliminates 70%+ manual touchpoints.</div><div class="kpi-source">Gartner AI Ops 2024</div></div><div class="kpi-card"><div class="kpi-card-head"><div class="kpi-name">CSAT Score</div><div class="kpi-dir kpi-dir-up">'+t('kpiIncrease')+'</div></div><div class="kpi-bar-track"><div class="kpi-bar-fill kpi-bar-blue" style="width:75%"></div></div><div class="kpi-ranges"><div><div class="kpi-range-label">'+t('kpiConserv')+'</div><div class="kpi-range-val mid">+8 pts</div></div><div><div class="kpi-range-label">'+t('kpiExpected')+'</div><div class="kpi-range-val good">+15 pts</div></div><div><div class="kpi-range-label">'+t('kpiBest')+'</div><div class="kpi-range-val" style="color:var(--accent)">+22 pts</div></div></div><div class="kpi-baseline-row"><div class="kpi-baseline-label">'+t('kpiBaseline')+'</div><div class="kpi-baseline-val">NPS 28–35</div></div><div class="kpi-note">Frictionless experience drives repurchase intent.</div><div class="kpi-source">McKinsey CX 2024</div></div></div><div class="kpi-footer"><div class="kpi-footer-dot"></div>'+t('kpiFooter')+'</div></div>';}document.getElementById('fn').style.display='flex';updateFn();}
+function randomize(){var inds=Object.keys(C);var ind=inds[Math.floor(Math.random()*inds.length)];var depts=Object.keys(C[ind].dept);var dept=depts[Math.floor(Math.random()*depts.length)];var is=document.getElementById('iSel'),ds=document.getElementById('dSel');is.value=ind;var dm=LANG==='es'?DM_ES:DM_EN;ds.innerHTML='<option value="">'+t('selProc')+'</option>';Object.keys(dm[ind]).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=dm[ind][k];ds.appendChild(o);});ds.value=dept;cur={ind:ind,dept:dept,d:C[ind].dept[dept]};showPre();}
+function flowHtml(nodes,ai){return nodes.map(function(n,i){if(n.b){var c='<div class="conn'+(ai?' conn-ai':'')+'"></div>';return c+'<div class="branch">'+n.b.map(function(b){return'<div class="bcol"><div class="blbl">'+b.l+'</div>'+b.n.map(function(bn,bi){return(bi>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+nd(bn);}).join('')+'</div>';}).join('')+'</div>';}return(i>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+nd(n);}).join('');}
+function nd(n){return'<div class="node '+(n.t==='end-node'?'end-node':n.t)+'">'+n.x+'</div>';}
+function showPage(page){document.getElementById('page-playground').classList.toggle('active',page==='playground');document.getElementById('page-analyzer').classList.toggle('active',page==='analyzer');document.getElementById('navPlayground').classList.toggle('active',page==='playground');document.getElementById('navAnalyzer').classList.toggle('active',page==='analyzer');if(page==='analyzer')initDropZone();}
+var azFileData=null;var azFileReady=true;var _dropInit=false;
+function initDropZone(){if(_dropInit)return;_dropInit=true;var zone=document.getElementById('azDropZone');zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('drag-over');});zone.addEventListener('dragleave',function(){zone.classList.remove('drag-over');zone.classList.remove('drop-glow');});zone.addEventListener('drop',function(e){e.preventDefault();zone.classList.remove('drag-over');zone.classList.remove('drop-glow');if(e.dataTransfer.files&&e.dataTransfer.files.length>0){handleFileObj(e.dataTransfer.files[0]);return;}var url=e.dataTransfer.getData('text/uri-list')||e.dataTransfer.getData('text/plain');if(url&&url.startsWith('data:image')){loadFlowmapAsFile(url);}});}
+function handleFile(inp){if(inp.files&&inp.files[0])handleFileObj(inp.files[0]);}
+function handleFileObj(file){var nameEl=document.getElementById('azFileName');var sizeLabel=file.size>1024*1024?(file.size/1024/1024).toFixed(1)+'MB':Math.round(file.size/1024)+'KB';nameEl.textContent='⏳ Processing '+file.name+'…';nameEl.style.display='block';document.getElementById('azDropZone').classList.add('loaded');azFileReady=false;document.getElementById('btnAnalyze').disabled=true;var isSvg=file.type==='image/svg+xml'||file.name.toLowerCase().endsWith('.svg');var isImg=!isSvg&&file.type.startsWith('image/'),isPdf=file.type==='application/pdf',isTxt=file.type==='text/plain'||isSvg;
+if(isTxt){var r=new FileReader();r.onload=function(e){var raw=e.target.result;var content=isSvg?'=== SVG DIAGRAM (extracted) ===\n'+raw.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,4000):raw;azFileData={type:'text',content:content,name:file.name};azFileReady=true;document.getElementById('btnAnalyze').disabled=false;nameEl.textContent='✓  '+file.name+(isSvg?' (SVG — diagram text extracted)':'  ('+sizeLabel+')');};r.readAsText(file);}
+else if(isImg){var r=new FileReader();r.onload=function(e){var img=new Image();img.onload=function(){var MAX=1024;var w=img.width,h=img.height;if(w>MAX||h>MAX){var s=Math.min(MAX/w,MAX/h);w=Math.round(w*s);h=Math.round(h*s);}var cvs=document.createElement('canvas');cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(img,0,0,w,h);var q=file.size>300*1024?0.82:0.92;var resized=cvs.toDataURL('image/jpeg',q).split(',')[1];var origKB=Math.round(file.size/1024);var newKB=Math.round(resized.length*0.75/1024);azFileData={type:'image',base64:resized,mimeType:'image/jpeg',name:file.name};azFileReady=true;document.getElementById('btnAnalyze').disabled=false;nameEl.textContent='✓  '+file.name+'  ('+origKB+'KB → '+newKB+'KB optimised)';};img.src=e.target.result;};r.readAsDataURL(file);}
+else if(isPdf){
+  var r=new FileReader();
+  r.onload=function(e){
+    var b64=e.target.result.split(',')[1];
+    azFileData={type:'pdf',base64:b64,name:file.name};
+    azFileReady=true;
+    document.getElementById('btnAnalyze').disabled=false;
+    nameEl.textContent='✓  '+file.name+'  ('+sizeLabel+' — ready)';
+  };
+  r.readAsDataURL(file);
+}else{var r=new FileReader();r.onload=function(e){var b64=e.target.result.split(',')[1];azFileData={type:'doc',base64:b64,mimeType:file.type,name:file.name};azFileReady=true;document.getElementById('btnAnalyze').disabled=false;nameEl.textContent='✓  '+file.name+'  ('+sizeLabel+')';};r.readAsDataURL(file);}}
+function loadFlowmapAsFile(dataUrl){var nameEl=document.getElementById('azFileName');nameEl.textContent='⏳ Optimising flowmap…';nameEl.style.display='block';document.getElementById('azDropZone').classList.add('loaded');var img=new Image();img.onload=function(){var MAX=1024;var w=img.width,h=img.height;if(w>MAX||h>MAX){var s=Math.min(MAX/w,MAX/h);w=Math.round(w*s);h=Math.round(h*s);}var cvs=document.createElement('canvas');cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(img,0,0,w,h);var resized=cvs.toDataURL('image/jpeg',0.88).split(',')[1];azFileData={type:'image',base64:resized,mimeType:'image/jpeg',name:'process-flowmap.png'};nameEl.textContent='✓  process-flowmap.png (optimised for analysis)';};img.src=dataUrl;}
+function clearAnalyzer(){azFileReady=true;['azText'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azFile').value='';document.getElementById('azFileName').style.display='none';document.getElementById('azFileName').textContent='';['azCompany','azIndustry','azScale','azPain'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azOutput').style.display='none';document.getElementById('azLoading').classList.remove('show');document.getElementById('azError').classList.remove('show');document.getElementById('azDropZone').classList.remove('loaded','drag-over');azFileData=null;}
+var flowmapImageUrl=null;
+function clearTranscript(){document.getElementById('trText').value='';document.getElementById('flowmapOutput').classList.remove('show');flowmapImageUrl=null;}
+function generateFlowmap(){var txt=document.getElementById('trText').value.trim();if(!txt||txt.length<50){alert(LANG==='es'?'Por favor pega un transcript más largo.':'Please paste a longer transcript.');return;}document.getElementById('trLoading').classList.add('show');document.getElementById('flowmapOutput').classList.remove('show');document.getElementById('btnFlowmap').disabled=true;var pf=document.getElementById('trProgressFill');var npf=pf.cloneNode(true);pf.parentNode.replaceChild(npf,pf);var outLang=LANG==='es'?'Respond in Spanish. All node text must be in Spanish.':'Respond in English.';var prompt=outLang+'\n\nYou are a business process analyst. Analyze the following transcript and extract ALL distinct business processes mentioned.\n\nFor each process, create a flowmap with these node types:\n- start: single trigger/start node\n- step: regular manual process steps (max 8 words)\n- decision: a yes/no branching question (max 6 words, phrase as question)\n- end: outcome/end node\n\nRespond ONLY with a valid JSON array. No markdown, no preamble.\n\nSchema:\n[\n  {\n    "processName": "Short process name (3-5 words)",\n    "emoji": "single relevant emoji",\n    "nodes": [\n      {"type": "start", "text": "Trigger description"},\n      {"type": "step", "text": "What happens"},\n      {"type": "decision", "text": "Question?", "branch": [\n        {"label": "Yes", "nodes": [{"type": "step", "text": "..."}]},\n        {"label": "No", "nodes": [{"type": "step", "text": "..."}]}\n      ]},\n      {"type": "end", "text": "Outcome"}\n    ]\n  }\n]\n\nRules:\n- Extract 1 to 4 processes maximum\n- Each process should have 4-8 nodes\n- Keep node text concise (max 8 words)\n- Respond ONLY with the JSON array\n\nTRANSCRIPT:\n'+txt;var fm_timeout_id=null;
+fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,system:'You are a business process analyst. Extract processes and respond only with a valid JSON array. No markdown fences.',messages:[{role:'user',content:prompt}]})}).then(function(r){
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}).then(function(data){
+  if(fm_timeout_id)clearTimeout(fm_timeout_id);
+  document.getElementById('trLoading').classList.remove('show');
+  document.getElementById('btnFlowmap').disabled=false;
+  if(data.error)throw new Error(data.error.message||'API error');
+  var raw='';(data.content||[]).forEach(function(b){if(b.type==='text')raw+=b.text;});
+  raw=raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+  var start=raw.indexOf('['),end=raw.lastIndexOf(']');
+  if(start!==-1&&end!==-1)raw=raw.substring(start,end+1);
+  if(!raw)throw new Error('Empty response. Try again.');
+  var processes=JSON.parse(raw);renderFlowmap(processes);
+}).catch(function(err){
+  if(fm_timeout_id)clearTimeout(fm_timeout_id);
+  document.getElementById('trLoading').classList.remove('show');
+  document.getElementById('btnFlowmap').disabled=false;
+  var msg=err.name==='AbortError'?'Timeout (45s) — try again.':err.message||'Error.';
+  alert('Flowmap error: '+msg);
+});}
+function renderFlowmap(processes){var canvas=document.getElementById('flowmapCanvas');canvas.innerHTML='';processes.forEach(function(proc,pi){var col=document.createElement('div');col.className='fmc-process';var title=document.createElement('div');title.className='fmc-process-title';title.textContent=(proc.emoji||'⬡')+' '+(proc.processName||'Process '+(pi+1));col.appendChild(title);renderFmcNodes(proc.nodes||[],col);canvas.appendChild(col);if(pi<processes.length-1){var sep=document.createElement('div');sep.style.cssText='width:1px;background:var(--rule);margin:0 4px;align-self:stretch;flex-shrink:0';canvas.appendChild(sep);}});document.getElementById('flowmapOutput').classList.add('show');setTimeout(captureFlowmapPng,300);}
+function renderFmcNodes(nodes,parent,isFirst){nodes.forEach(function(n,i){if(i>0||(isFirst===false)){var conn=document.createElement('div');conn.className='fmc-conn';parent.appendChild(conn);}if(n.branch){var decEl=document.createElement('div');decEl.className='fmc-node decision';decEl.textContent=n.text||'Decision?';parent.appendChild(decEl);var conn2=document.createElement('div');conn2.className='fmc-conn';parent.appendChild(conn2);var branchRow=document.createElement('div');branchRow.className='fmc-branch';n.branch.forEach(function(b){var bcol=document.createElement('div');bcol.className='fmc-bcol';var blbl=document.createElement('div');blbl.className='fmc-blbl';blbl.textContent=b.label||'';bcol.appendChild(blbl);renderFmcNodes(b.nodes||[],bcol,false);branchRow.appendChild(bcol);});parent.appendChild(branchRow);}else{var typ=n.type==='start'?'start':n.type==='end'?'end':'step';var nodeEl=document.createElement('div');nodeEl.className='fmc-node '+typ;nodeEl.textContent=n.text||'';parent.appendChild(nodeEl);}});}
+function captureFlowmapPng(){var canvas=document.getElementById('flowmapCanvas');var w=Math.max(canvas.scrollWidth,600);var h=Math.max(canvas.scrollHeight,400);var cvs=document.createElement('canvas');var dpr=window.devicePixelRatio||1;cvs.width=w*dpr;cvs.height=h*dpr;var ctx=cvs.getContext('2d');ctx.scale(dpr,dpr);ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);var procs=canvas.querySelectorAll('.fmc-process');procs.forEach(function(proc){var canvasR=canvas.getBoundingClientRect();var nodes=proc.querySelectorAll('.fmc-node');nodes.forEach(function(nodeEl){var nr=nodeEl.getBoundingClientRect();var nx=nr.left-canvasR.left;var ny=nr.top-canvasR.top;var nw=nr.width;var nh=nr.height;var cls=nodeEl.className;if(cls.indexOf('start')!==-1||cls.indexOf('end')!==-1){ctx.fillStyle='#0d0f1a';}else if(cls.indexOf('decision')!==-1){ctx.fillStyle='#fff8ed';}else{ctx.fillStyle='#fdf2f3';}roundRect(ctx,nx,ny,nw,nh,6);ctx.fill();if(cls.indexOf('start')!==-1||cls.indexOf('end')!==-1)ctx.fillStyle='#ffffff';else if(cls.indexOf('decision')!==-1)ctx.fillStyle='#9a4e00';else ctx.fillStyle='#c0182a';ctx.font='500 10px Inter, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(nodeEl.textContent||'',nx+nw/2,ny+nh/2);});var titleEl=proc.querySelector('.fmc-process-title');if(titleEl){var tr=titleEl.getBoundingClientRect();var ty=tr.top-canvasR.top;var tx=tr.left-canvasR.left;var tw=tr.width;ctx.fillStyle='#5535cc';ctx.font='600 9px IBM Plex Mono, monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(titleEl.textContent,tx+tw/2,ty+tr.height/2);}});flowmapImageUrl=cvs.toDataURL('image/png');makeDraggable();}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+r);ctx.lineTo(x,y);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function downloadFlowmap(){if(!flowmapImageUrl){captureFlowmapPng();setTimeout(downloadFlowmap,400);return;}var a=document.createElement('a');a.href=flowmapImageUrl;a.download='process-flowmap.png';a.click();}
+function makeDraggable(){var wrap=document.getElementById('flowmapOutput');wrap.draggable=true;wrap.addEventListener('dragstart',function(e){if(flowmapImageUrl){e.dataTransfer.setData('text/uri-list',flowmapImageUrl);e.dataTransfer.setData('text/plain',flowmapImageUrl);}});var zone=document.getElementById('azDropZone');wrap.addEventListener('dragstart',function(){zone.classList.add('drop-glow');});wrap.addEventListener('dragend',function(){zone.classList.remove('drop-glow');});}
+function runAnalysis(){
+var textInput=document.getElementById('azText').value.trim();
+var L=T[LANG];
+if(!textInput&&!azFileData){
+  document.getElementById('azError').classList.add('show');
+  document.getElementById('azErrorMsg').textContent=LANG==='es'?'Por favor proporciona una descripcion o sube un documento.':'Please provide a description or upload a document.';
+  return;
+}
+document.getElementById('azError').classList.remove('show');
+document.getElementById('azOutput').style.display='none';
+document.getElementById('azLoading').classList.add('show');
+document.getElementById('btnAnalyze').disabled=true;
+var pf=document.getElementById('azProgressFill');
+var npf=pf.cloneNode(true);pf.parentNode.replaceChild(npf,pf);
+var msgs=[L.azL1,L.azL2,L.azL3];var mi=0;
+document.getElementById('azLoadingSub').textContent=msgs[0];
+var iv=setInterval(function(){mi=(mi+1)%msgs.length;document.getElementById('azLoadingSub').textContent=msgs[mi];},3000);
+
+var company=document.getElementById('azCompany').value.trim();
+var industry=document.getElementById('azIndustry').value.trim();
+var scale=document.getElementById('azScale').value.trim();
+var pain=document.getElementById('azPain').value.trim();
+var meta='';
+if(company)meta+='Client: '+company+'\n';
+if(industry)meta+='Industry: '+industry+'\n';
+if(scale)meta+='Scale: '+scale+'\n';
+if(pain)meta+='Pain: '+pain+'\n';
+var textBlock='';
+if(meta)textBlock+=meta+'\n';
+if(textInput)textBlock+=textInput+'\n';
+
+var contentParts=[];
+if(azFileData){
+  if(azFileData.type==='image'){
+    if(textBlock)contentParts.push({type:'text',text:textBlock});
+    contentParts.push({type:'image',source:{type:'base64',media_type:azFileData.mimeType,data:azFileData.base64}});
+    contentParts.push({type:'text',text:'Workflow diagram above.'});
+  } else if(azFileData.type==='pdf'){
+    if(textBlock)contentParts.push({type:'text',text:textBlock});
+    contentParts.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:azFileData.base64}});
+  } else {
+    contentParts.push({type:'text',text:textBlock+(azFileData.content?'\n'+azFileData.content:'')});
+  }
+} else {
+  contentParts.push({type:'text',text:textBlock});
+}
+
+var needsVision=azFileData&&(azFileData.type==='image'||azFileData.type==='pdf');
+var mdl=needsVision?'claude-sonnet-4-5':'claude-haiku-4-5-20251001';
+var outLang=LANG==='es'?'Respond entirely in Spanish.':'Respond in English.';
+
+var prompt=outLang+'\n\nAI architect. Analyze workflow. Return ONLY raw JSON, no markdown, no explanation.\n\nRequired fields: processName, industry, summary, tags(3), impact(timeSaved,costReduction,scale), preTitle, postTitle, preFlow(nodes with type+text; types: start/pain/decision/end-node; decisions have branch:[{label,nodes}]), postFlow(nodes; types: start/agent/gain/decision/end-node), techStack(3 rows: layer,tools[],rationale), cloud, kpis(3: name,direction,unit,preBaseline,conservative,expected,bestInClass,barPct,note,source), recommendations(3), confidence(overall,inputComprehension,architectureQuality,kpiReliability as 0-100 ints, flags:[{level,title,detail}], rationale).\n\nReturn ONLY the JSON object.';
+
+contentParts.push({type:'text',text:prompt});
+
+fetch('/api/analyze',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({
+    model:mdl,
+    max_tokens:1800,
+    system:'You are an AI architect. Return only a raw valid JSON object. No markdown. No code fences.',
+    messages:[{role:'user',content:contentParts}]
+  })
+}).then(function(r){
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}).then(function(data){
+  clearInterval(iv);
+  if(data.error){
+    var msg=data.error.message||'API error';
+    if(data.error.type==='authentication_error')msg='API error: open this app inside Claude.ai.';
+    throw new Error(msg);
+  }
+  var raw='';
+  (data.content||[]).forEach(function(b){if(b.type==='text')raw+=b.text;});
+  raw=raw.replace(/^```[a-z]*\s*/i,'').replace(/\s*```\s*$/,'').trim();
+  var start=raw.indexOf('{');
+  var end=raw.lastIndexOf('}');
+  if(start===-1||end===-1||end<=start)throw new Error(LANG==='es'?'El modelo no devolvio JSON. Intenta de nuevo.':'Model did not return JSON. Try again.');
+  raw=raw.substring(start,end+1);
+  var result;
+  try{result=JSON.parse(raw);}
+  catch(e){throw new Error(LANG==='es'?'Error al parsear. Intenta de nuevo.':'Parse error. Try again.');}
+  document.getElementById('azLoading').classList.remove('show');
+  document.getElementById('btnAnalyze').disabled=false;
+  renderAnalysis(result);
+  document.getElementById('azOutput').scrollIntoView({behavior:'smooth',block:'start'});
+}).catch(function(err){
+  clearInterval(iv);
+  document.getElementById('azLoading').classList.remove('show');
+  document.getElementById('btnAnalyze').disabled=false;
+  document.getElementById('azError').classList.add('show');
+  var msg=err.message||'Error.';
+  if(msg.indexOf('Failed to fetch')!==-1||msg.indexOf('NetworkError')!==-1)
+    msg=LANG==='es'?'Error de red. Asegurate de abrir la app dentro de Claude.ai.':'Network error. Open this app inside Claude.ai.';
+  document.getElementById('azErrorMsg').textContent=msg;
+});}
+
+function guessChip(layer){var l=(layer||'').toLowerCase();if(l.indexOf('ai')!==-1||l.indexOf('llm')!==-1)return'ai';if(l.indexOf('database')!==-1||l.indexOf('db')!==-1||l.indexOf('datos')!==-1)return'db';if(l.indexOf('infra')!==-1||l.indexOf('cloud')!==-1)return'infra';if(l.indexOf('framework')!==-1)return'frame';if(l.indexOf('language')!==-1||l.indexOf('lenguaje')!==-1)return'lang';if(l.indexOf('integr')!==-1)return'int';return'lang';}
+function renderAzFlow(nodes,ai){return nodes.map(function(n,i){if(n.branch){var c='<div class="conn'+(ai?' conn-ai':'')+'"></div>';return c+'<div class="branch">'+n.branch.map(function(b){return'<div class="bcol"><div class="blbl">'+b.label+'</div>'+(b.nodes||[]).map(function(bn,bi){return(bi>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(bn.type==='end-node'?'end-node':(bn.type||'pain'))+'">'+bn.text+'</div>';}).join('')+'</div>';}).join('')+'</div>';}return(i>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(n.type==='end-node'?'end-node':(n.type||'pain'))+'">'+(n.text||'')+'</div>';}).join('');}
+function ciMeterClass(v){return v>=75?'ci-meter-high':v>=50?'ci-meter-med':'ci-meter-low';}
+function ciValClass(v){return v>=75?'high':v>=50?'med':'low';}
+function getCompNote(v){return LANG==='es'?(v>=75?'Contexto claro y suficiente':v>=50?'Contexto parcialmente claro':'Input ambiguo o insuficiente'):(v>=75?'Clear, sufficient context':v>=50?'Partially clear context':'Ambiguous or insufficient input');}
+function getArchNote(v){return LANG==='es'?(v>=75?'Arquitectura bien fundamentada':v>=50?'Plausible, validar supuestos':'Alta incertidumbre arquitectónica'):(v>=75?'Well-grounded architecture':v>=50?'Plausible, validate assumptions':'High architectural uncertainty');}
+function getKpiNote(v){return LANG==='es'?(v>=75?'KPIs anclados en benchmarks':v>=50?'Estimados, calibrar con cliente':'Muy aproximados, necesitan validación'):(v>=75?'KPIs anchored in benchmarks':v>=50?'Estimated, calibrate with client':'Rough KPIs, need validation');}
+function renderAnalysis(r){var L=T[LANG];document.getElementById('azOutTitle').textContent=r.processName||'Analysis Complete';document.getElementById('azOutSub').textContent=(r.industry||'')+L.azOutSubTpl;var imp=r.impact||{};var tags=(r.tags||[]).map(function(tg){return'<span class="az-summary-tag">'+tg+'</span>';}).join('');var html='';html+='<div class="az-summary"><div><div class="az-summary-name">'+(r.industry||'')+'</div><div class="az-summary-title">'+(r.processName||'')+'</div><div class="az-summary-desc">'+(r.summary||'')+'</div><div class="az-summary-tags">'+tags+'</div></div><div class="az-summary-kpis"><div class="az-summary-kpi"><div class="az-summary-kpi-v">'+(imp.timeSaved||'—')+'</div><div class="az-summary-kpi-l">'+L.metTime+'</div></div><div class="az-summary-kpi"><div class="az-summary-kpi-v">'+(imp.costReduction||'—')+'</div><div class="az-summary-kpi-l">'+L.metCost+'</div></div><div class="az-summary-kpi"><div class="az-summary-kpi-v">'+(imp.scale||'—')+'</div><div class="az-summary-kpi-l">'+L.metScale+'</div></div></div></div>';html+='<div class="ag" style="margin-bottom:16px"><div class="ap"><div class="ap-head"><div class="ap-lbl"><div class="ld ld-b"></div>'+L.before+'</div><div class="ap-sub">'+(r.preTitle||'')+'</div></div><div class="ab"><div class="flow">'+renderAzFlow(r.preFlow||[],false)+'</div></div></div><div class="ap"><div class="ap-head" style="background:#f0faf6;border-bottom-color:#c8eadd"><div class="ap-lbl"><div class="ld ld-a"></div>'+L.after+'</div><div class="ap-sub">'+(r.postTitle||'')+'</div></div><div class="ab"><div class="flow">'+renderAzFlow(r.postFlow||[],true)+'</div></div></div></div>';if(r.techStack&&r.techStack.length){var rows=r.techStack.map(function(row){var tools=(row.tools||[]).map(function(tool){return'<span class="chip chip-'+guessChip(row.layer)+'">'+tool+'</span>';}).join('');return'<tr><td style="width:130px"><span class="ts-cat">'+row.layer+'</span></td><td><div class="ts-tools">'+tools+'</div></td><td><span class="ts-note">'+(row.rationale||'')+'</span></td></tr>';}).join('');html+='<div class="ts-wrap" style="margin-bottom:16px"><div class="ts-head"><div class="ts-title">'+L.stackTitle+'</div><div class="ts-sub">'+L.azStackSub+' '+(r.cloud||'TBD')+'</div></div><table class="ts-table"><thead><tr><th>'+L.stackLayer+'</th><th>'+L.stackTools+'</th><th>'+L.stackRat+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>';}if(r.kpis&&r.kpis.length){var kpiCards=r.kpis.map(function(k){var isD=k.direction==='down';return'<div class="kpi-card"><div class="kpi-card-head"><div class="kpi-name">'+k.name+'</div><div class="kpi-dir '+(isD?'kpi-dir-down':'kpi-dir-up')+'">'+(isD?L.kpiReduce:L.kpiIncrease)+'</div></div><div class="kpi-bar-track"><div class="kpi-bar-fill '+(isD?'kpi-bar-green':'kpi-bar-blue')+'" style="width:'+(k.barPct||70)+'%"></div></div><div class="kpi-ranges"><div><div class="kpi-range-label">'+L.kpiConserv+'</div><div class="kpi-range-val mid">'+(k.conservative||'—')+'</div></div><div><div class="kpi-range-label">'+L.kpiExpected+'</div><div class="kpi-range-val good">'+(k.expected||'—')+'</div></div><div><div class="kpi-range-label">'+L.kpiBest+'</div><div class="kpi-range-val" style="color:var(--accent)">'+(k.bestInClass||'—')+'</div></div></div><div class="kpi-baseline-row"><div class="kpi-baseline-label">'+L.kpiBaseline+'</div><div class="kpi-baseline-val">'+(k.preBaseline||'—')+'</div></div><div class="kpi-note">'+(k.note||'')+'</div><div class="kpi-source">'+(k.source||'')+'</div></div>';}).join('');html+='<div class="kpi-wrap" style="margin-bottom:16px"><div class="kpi-section-head"><div class="kpi-section-title">'+L.azKpiTitle+'</div><div class="kpi-section-sub">'+L.azKpiSub+'</div></div><div class="kpi-grid">'+kpiCards+'</div><div class="kpi-footer"><div class="kpi-footer-dot"></div>'+L.azKpiFooter+'</div></div>';}if(r.recommendations&&r.recommendations.length){html+='<div class="az-reco"><div class="az-reco-title">'+L.azReco+'</div><div class="az-reco-list">'+r.recommendations.map(function(rec){return'<div class="az-reco-item">'+rec+'</div>';}).join('')+'</div></div>';}var ci=r.confidence||{overall:50,inputComprehension:50,architectureQuality:50,kpiReliability:50,flags:[],rationale:''};var ov=Math.round(ci.overall||50);var ovLevel=ov>=75?'high':ov>=50?'med':'low';var ovLabel=ov>=75?L.ciOverallHigh:ov>=50?L.ciOverallMed:L.ciOverallLow;var ic=Math.round(ci.inputComprehension||50),aq=Math.round(ci.architectureQuality||50),kr=Math.round(ci.kpiReliability||50);var flagsHtml=(ci.flags||[]).map(function(f){var cls=f.level==='ok'?'ci-flag-ok':f.level==='warn'?'ci-flag-warn':'ci-flag-risk';var icon=f.level==='ok'?L.flagOk:f.level==='warn'?L.flagWarn:L.flagRisk;return'<div class="ci-flag '+cls+'"><div class="ci-flag-icon">'+icon+'</div><div class="ci-flag-text"><strong>'+f.title+'</strong> — '+f.detail+'</div></div>';}).join('');var verdictClass=ov>=75?'ci-verdict-go':ov>=50?'ci-verdict-caution':'ci-verdict-hold';var verdictKey=ov>=75?'ciVerdictGo':ov>=50?'ciVerdictCaution':'ciVerdictHold';var verdictIcon=ov>=75?L.ciVerdictIcon.go:ov>=50?L.ciVerdictIcon.caution:L.ciVerdictIcon.hold;html+='<div class="ci-panel"><div class="ci-head"><div><div class="ci-head-title">'+L.ciTitle+'</div><div class="ci-head-sub">'+L.ciSub+'</div></div><div class="ci-badge ci-badge-'+ovLevel+'">'+ov+'% &nbsp;'+ovLabel+'</div></div><div class="ci-body"><div class="ci-grid"><div class="ci-metric"><div class="ci-metric-label">'+L.ciDimLabel1+'</div><div class="ci-meter-track"><div class="ci-meter-fill '+ciMeterClass(ic)+'" style="width:'+ic+'%"></div></div><div class="ci-metric-value '+ciValClass(ic)+'">'+ic+'<span style="font-size:14px;color:var(--ink-4)">%</span></div><div class="ci-metric-note">'+getCompNote(ic)+'</div></div><div class="ci-metric"><div class="ci-metric-label">'+L.ciDimLabel2+'</div><div class="ci-meter-track"><div class="ci-meter-fill '+ciMeterClass(aq)+'" style="width:'+aq+'%"></div></div><div class="ci-metric-value '+ciValClass(aq)+'">'+aq+'<span style="font-size:14px;color:var(--ink-4)">%</span></div><div class="ci-metric-note">'+getArchNote(aq)+'</div></div><div class="ci-metric"><div class="ci-metric-label">'+L.ciDimLabel3+'</div><div class="ci-meter-track"><div class="ci-meter-fill '+ciMeterClass(kr)+'" style="width:'+kr+'%"></div></div><div class="ci-metric-value '+ciValClass(kr)+'">'+kr+'<span style="font-size:14px;color:var(--ink-4)">%</span></div><div class="ci-metric-note">'+getKpiNote(kr)+'</div></div></div>'+(flagsHtml?'<div class="ci-flags">'+flagsHtml+'</div>':'')+'<div class="ci-verdict '+verdictClass+'"><div class="ci-verdict-icon">'+verdictIcon+'</div><div>'+L[verdictKey]+(ci.rationale?'<br><span style="opacity:.8;font-size:11.5px">'+ci.rationale+'</span>':'')+'</div></div></div><div class="ci-footer">'+L.ciFooter+'</div></div>';document.getElementById('azOutputBody').innerHTML=html;document.getElementById('azOutput').style.display='block';document.getElementById('azOutput').scrollIntoView({behavior:'smooth',block:'start'});}
+(function(){rebuildDropdowns();updateFn();})();
+</script>
+</body>
+</html>
