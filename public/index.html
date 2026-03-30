@@ -950,7 +950,7 @@ fetch('/api/analyze',{
   headers:{'Content-Type':'application/json'},
   body:JSON.stringify({
     model:mdl,
-    max_tokens:4000,
+    max_tokens:6000,
     system:'You are an AI architect. Return only a raw valid JSON object. No markdown. No code fences.',
     messages:[{role:'user',content:contentParts}]
   })
@@ -972,8 +972,7 @@ fetch('/api/analyze',{
   if(start===-1||end===-1||end<=start)throw new Error(LANG==='es'?'El modelo no devolvio JSON. Intenta de nuevo.':'Model did not return JSON. Try again.');
   raw=raw.substring(start,end+1);
   var result;
-  try{result=JSON.parse(raw);}
-  catch(e){throw new Error(LANG==='es'?'Error al parsear. Intenta de nuevo.':'Parse error. Try again.');}
+  try{result=JSON.parse(raw);}catch(e){try{var fx=raw,op=(fx.match(/\{/g)||[]).length-(fx.match(/\}/g)||[]).length,oa=(fx.match(/\[/g)||[]).length-(fx.match(/\]/g)||[]).length;if(oa>0)fx+=']'.repeat(oa);if(op>0)fx+='}}'.repeat(op);result=JSON.parse(fx);}catch(e2){throw new Error(LANG==='es'?'Error al parsear. Intenta de nuevo.':'Parse error. Try again.');}}
   document.getElementById('azLoading').classList.remove('show');
   document.getElementById('btnAnalyze').disabled=false;
   renderAnalysis(result);
