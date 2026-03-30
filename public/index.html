@@ -990,7 +990,37 @@ fetch('/api/analyze',{
 });}
 
 function guessChip(layer){var l=(layer||'').toLowerCase();if(l.indexOf('ai')!==-1||l.indexOf('llm')!==-1)return'ai';if(l.indexOf('database')!==-1||l.indexOf('db')!==-1||l.indexOf('datos')!==-1)return'db';if(l.indexOf('infra')!==-1||l.indexOf('cloud')!==-1)return'infra';if(l.indexOf('framework')!==-1)return'frame';if(l.indexOf('language')!==-1||l.indexOf('lenguaje')!==-1)return'lang';if(l.indexOf('integr')!==-1)return'int';return'lang';}
-function renderAzFlow(nodes,ai){if(!Array.isArray(nodes))nodes=[];return nodes.map(function(n,i){if(!n||typeof n!=="object")return "";var validTypes=["start","pain","gain","agent","decision","end-node","step","end"];if(n.type&&!validTypes.includes(n.type)){n=Object.assign({},n,{type:ai?"gain":"pain"});}if(n.branch){var c='<div class="conn'+(ai?' conn-ai':'')+'"></div>';return c+'<div class="branch">'+n.branch.map(function(b){return'<div class="bcol"><div class="blbl">'+b.label+'</div>'+(b.nodes||[]).map(function(bn,bi){return(bi>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(bn.type==='end-node'?'end-node':(bn.type||'pain'))+'">'+bn.text+'</div>';}).join('')+'</div>';}).join('')+'</div>';}return(i>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(n.type==='end-node'?'end-node':(n.type||'pain'))+'">'+(n.text||'')+'</div>';}).join('');}
+function renderAzFlow(nodes,ai){
+if(!Array.isArray(nodes)){
+  if(nodes&&nodes.nodes&&Array.isArray(nodes.nodes))nodes=nodes.nodes;
+  else nodes=[];
+}
+var validPre=['start','pain','decision','end-node'];
+var validPost=['start','agent','gain','decision','end-node'];
+var validAll=validPre.concat(['gain','agent','step','end']);
+return nodes.map(function(n,i){
+  if(!n||typeof n!=='object')return '';
+  var typ=n.type||'';
+  if(!validAll.includes(typ)){typ=ai?'gain':'pain';}
+  if(n.branch||n.branches){
+    var branches=n.branch||n.branches||[];
+    if(!Array.isArray(branches))branches=[];
+    var c='<div class="conn'+(ai?' conn-ai':'')+'"></div>';
+    return c+'<div class="branch">'+branches.map(function(b){
+      if(!b||typeof b!=='object')return '';
+      var bNodes=b.nodes||b.steps||[];
+      if(!Array.isArray(bNodes))bNodes=[];
+      return '<div class="bcol"><div class="blbl">'+(b.label||'')+'</div>'+bNodes.map(function(bn,bi){
+        if(!bn||typeof bn!=='object')return '';
+        var bt=bn.type||'';
+        if(!validAll.includes(bt)){bt=ai?'gain':'pain';}
+        return(bi>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(bt==='end-node'?'end-node':bt)+'">'+(bn.text||bn.label||'')+'</div>';
+      }).join('')+'</div>';
+    }).join('')+'</div>';
+  }
+  return(i>0?'<div class="conn'+(ai?' conn-ai':'')+'"></div>':'')+'<div class="node '+(typ==='end-node'?'end-node':typ)+'">'+(n.text||n.label||n.description||'')+'</div>';
+}).join('');}
+
 function ciMeterClass(v){return v>=75?'ci-meter-high':v>=50?'ci-meter-med':'ci-meter-low';}
 function ciValClass(v){return v>=75?'high':v>=50?'med':'low';}
 function getCompNote(v){return LANG==='es'?(v>=75?'Contexto claro y suficiente':v>=50?'Contexto parcialmente claro':'Input ambiguo o insuficiente'):(v>=75?'Clear, sufficient context':v>=50?'Partially clear context':'Ambiguous or insufficient input');}
