@@ -1089,6 +1089,37 @@ function exportPDF(){
       });
       html+='</div>';
     }
+    // Arquitecturas Pre/Post AI (antes del cuerpo)
+    var isESx=(window.LANG||'en')==='es';
+    var flowCss='<style>.pdf-flow{display:flex;gap:12px;margin-bottom:8px;}.pdf-flow-col{flex:1;}.pdf-flow-title{font-family:monospace;font-size:8pt;letter-spacing:1.5px;text-transform:uppercase;padding:6px 10px;margin-bottom:8px;border-radius:4px;}.pdf-flow-pre .pdf-flow-title{background:#0d0f1a;color:#fff;}.pdf-flow-post .pdf-flow-title{background:#eef7f2;color:#0a7a52;border:1px solid #a0dcca;}.pdf-node{padding:8px 12px;border-radius:5px;font-size:9pt;margin-bottom:6px;line-height:1.4;text-align:center;border:1px solid #d6dae6;}.pdf-node.start,.pdf-node.end-node{background:#0d0f1a;color:#fff;border-color:#0d0f1a;}.pdf-node.pain{background:#fdf2f3;border-color:#f0b8be;color:#c0182a;}.pdf-node.agent{background:#eef2ff;border-color:#b8c7ff;color:#2356e8;}.pdf-node.gain{background:#e8f7f2;border-color:#a0dcca;color:#0a7a52;}.pdf-node.decision{background:#fff8ed;border-color:#f0ccaa;color:#9a4e00;}.pdf-conn{width:1px;height:12px;background:#d6dae6;margin:0 auto 6px;}</style>';
+    html+=flowCss;
+    html+='<h2>'+(isESx?'Arquitectura del Proceso':'Process Architecture')+'</h2>';
+    html+='<div class="pdf-flow">';
+    // PRE-AI column
+    html+='<div class="pdf-flow-col pdf-flow-pre">';
+    html+='<div class="pdf-flow-title">● '+(r.preTitle||(isESx?'Estado Actual':'Current State'))+'</div>';
+    var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
+    preNodes.forEach(function(n,i){
+      if(!n)return;
+      var ty=n.type||'pain';
+      var tx=n.text||n.label||'';
+      if(i>0)html+='<div class="pdf-conn"></div>';
+      html+='<div class="pdf-node '+ty+'">'+tx+'</div>';
+    });
+    html+='</div>';
+    // POST-AI column
+    html+='<div class="pdf-flow-col pdf-flow-post">';
+    html+='<div class="pdf-flow-title">● '+(r.postTitle||(isESx?'Arquitectura AI':'AI Architecture'))+'</div>';
+    var postNodes=Array.isArray(r.postFlow)?r.postFlow:(r.postFlow&&r.postFlow.nodes?r.postFlow.nodes:[]);
+    postNodes.forEach(function(n,i){
+      if(!n)return;
+      var ty=n.type||'gain';
+      var tx=n.text||n.label||'';
+      if(i>0)html+='<div class="pdf-conn"></div>';
+      html+='<div class="pdf-node '+ty+'">'+tx+'</div>';
+    });
+    html+='</div>';
+    html+='</div>';
     // Cuerpo generado por Claude
     html+=body;
     // Confidence
@@ -1124,97 +1155,103 @@ function exportPPT(){
   var btn=document.getElementById('btnExportPPT');
   btn.disabled=true;btn.textContent='Building deck...';
   var isES=(window.LANG||'en')==='es';
-  // Prompt mas simple y robusto — menos campos = JSON mas limpio
-  var deckPrompt='Create an 8-slide executive presentation about AI transformation for a client. '
-    +'Return ONLY a JSON object (no markdown, no explanation): '
-    +'{"title":"string","subtitle":"string","slides":[{"title":"string","content":"string"},...]}'
-    +' where content uses simple bullet points with - prefix. '
-    +'Slide titles: 1.Cover, 2.Current Situation, 3.Pain Diagnosis, 4.AI Architecture, 5.Tech Stack, 6.KPIs, 7.Investment, 8.Next Steps. '
+  // Paso 1: Generar contenido estructurado con Claude
+  var deckPrompt='Create content for an 8-slide executive presentation about AI transformation. '
+    +'Return ONLY valid JSON (no markdown, no explanation): '
+    +'{"title":"...","subtitle":"...","slides":[{"title":"...","content":"..."},...]} '
+    +'Slides: 1.Cover/Title, 2.Current Situation, 3.Pain Diagnosis, 4.AI Architecture Solution, '
+    +'5.Technology Stack, 6.Projected KPIs, 7.Investment and Timeline, 8.Next Steps. '
     +'Language: '+(isES?'Spanish':'English')+'. '
-    +'Keep all strings short. No special characters, no quotes inside strings. '
-    +'Client data: processName='+JSON.stringify(r.processName||'')+', industry='+JSON.stringify(r.industry||'')+', '
+    +'Use short bullet points with - prefix. No special chars or inner quotes. '
+    +'Data: processName='+JSON.stringify(r.processName||'')+', industry='+JSON.stringify(r.industry||'')+', '
+    +'summary='+JSON.stringify((r.summary||'').substring(0,200))+', '
     +'impact='+JSON.stringify(r.impact||{})+', '
-    +'recommendations='+JSON.stringify((r.recommendations||[]).slice(0,2).map(function(x){return typeof x==='string'?x:(x.text||'');}));
+    +'preTitle='+JSON.stringify(r.preTitle||'')+', postTitle='+JSON.stringify(r.postTitle||'')+', '
+    +'recommendations='+JSON.stringify((r.recommendations||[]).slice(0,3).map(function(x){return typeof x==='string'?x.substring(0,80):(x.text||'').substring(0,80);}));
   fetch('/api/analyze',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,system:'Return only raw valid JSON. No markdown, no code fences, no explanation.',messages:[{role:'user',content:deckPrompt}]})
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,
+      system:'Return only raw valid JSON. No markdown.',
+      messages:[{role:'user',content:deckPrompt}]})
   })
   .then(function(res){return res.json();})
   .then(function(data){
     var raw=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
-    // Limpiar agresivamente
     raw=raw.replace(/^```json?\s*/i,'').replace(/\s*```$/,'').trim();
     var s=raw.indexOf('{'),e=raw.lastIndexOf('}');
-    if(s===-1||e===-1){throw new Error('No JSON found in response');}
     var deck;
     try{deck=JSON.parse(raw.substring(s,e+1));}
-    catch(jsonErr){
-      // Intentar reparar JSON truncado
-      var partial=raw.substring(s);
-      // Cerrar arrays y objetos abiertos
-      var opens=0,openo=0;
-      for(var i=0;i<partial.length;i++){
-        if(partial[i]==='[')opens++;else if(partial[i]===']')opens--;
-        if(partial[i]==='{')openo++;else if(partial[i]==='}')openo--;
-      }
-      var fix=partial;
-      // Cerrar string abierto si hay
-      if((fix.match(/"/g)||[]).length%2!==0)fix+='"';
-      while(opens>0){fix+=']';opens--;}
-      while(openo>0){fix+='}';openo--;}
-      try{deck=JSON.parse(fix);}
-      catch(e2){
-        // Construir deck minimo manualmente
-        deck={title:r.processName||'AI Transformation',subtitle:r.industry||'',slides:[
-          {title:isES?'Presentacion':'Cover',content:r.summary||''},
-          {title:isES?'Situacion Actual':'Current State',content:(r.impact&&r.impact.timeSaved)||''},
-          {title:isES?'Solucion AI':'AI Solution',content:''},
-          {title:isES?'Proximos Pasos':'Next Steps',content:''}
-        ]};
-      }
+    catch(err){
+      deck={title:r.processName||'AI Transformation',subtitle:r.industry||'',
+        slides:[{title:'Cover',content:r.summary||''},{title:'Current State',content:r.preTitle||''},
+                {title:'AI Solution',content:r.postTitle||''},{title:'Next Steps',content:''}]};
     }
-    // Construir inputText para Gamma
-    var inputText='# '+(deck.title||r.processName||'AI Transformation')+'\n\n';
-    inputText+='**'+(deck.subtitle||r.industry||'')+'**\n\n';
-    inputText+='---\n*Prepared by HACIA — AI Transformation Partner | hacia.ai*\n---\n\n';
+    // Paso 2: Llamar Gamma API directamente
+    var inputText='# '+(deck.title||r.processName)+'\n\n**'+(deck.subtitle||r.industry)+'**\n\n';
+    inputText+='---\n*Prepared by HACIA \u2014 AI Transformation Partner*\n---\n\n';
     (deck.slides||[]).forEach(function(sl){
       if(!sl||!sl.title)return;
       inputText+='## '+sl.title+'\n\n'+(sl.content||'')+'\n\n';
     });
-    inputText+='---\n*hacia.ai | AI Transformation for LATAM*';
-    // Llamar Gamma MCP
-    return fetch('/api/analyze',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+    inputText+='---\n*hacia.ai*';
+    // Llamar a Gamma API REST
+    return fetch('https://api.gamma.app/v1/generate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+window._gammaKey},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:2000,
-        system:'Use the Gamma MCP generate tool to create a presentation with the content provided. Return the gammaUrl.',
-        messages:[{role:'user',content:'Create a professional executive presentation. Use dark professional theme. Language: '+(isES?'es':'en')+'. Content:\n\n'+inputText}],
-        mcp_servers:[{type:'url',url:'https://mcp.gamma.app/mcp',name:'gamma-mcp'}]
+        title:deck.title||r.processName,
+        markdown:inputText,
+        mode:'text_to_slides',
+        theme:'dark_professional',
+        language:isES?'es':'en'
       })
     });
   })
-  .then(function(res){return res.json();})
+  .then(function(res){
+    if(!res.ok) throw new Error('Gamma API: '+res.status);
+    return res.json();
+  })
   .then(function(data){
-    var text=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join(' ');
-    var toolResults=(data.content||[]).filter(function(b){return b.type==='mcp_tool_result';});
-    var gammaUrl=null;
-    toolResults.forEach(function(tr){
-      var c=(tr.content||[]).map(function(x){return x.text||'';}).join(' ');
-      var m=c.match(/https:\/\/gamma\.app\/[^\s"')]+/);if(m)gammaUrl=m[0];
-    });
-    if(!gammaUrl){var m=text.match(/https:\/\/gamma\.app\/[^\s"')]+/);if(m)gammaUrl=m[0];}
-    btn.disabled=false;btn.textContent='📊 Build PPT';
-    if(gammaUrl){
+    btn.disabled=false;btn.textContent='\uD83D\uDCCA Build PPT';
+    var url=data.url||data.gammaUrl||data.shareUrl||data.link;
+    if(url){
       var n=document.createElement('div');
       n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#553acc;color:#fff;padding:16px 24px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(85,58,204,0.3);display:flex;gap:12px;align-items:center;max-width:500px;font-family:Inter,sans-serif;';
-      n.innerHTML='<span style="font-size:20px">🎯</span><div><strong>'+(isES?'Deck creado!':'Deck created!')+'</strong><br><a href="'+gammaUrl+'" target="_blank" style="color:#c8c0f0;text-decoration:underline;">'+(isES?'Abrir en Gamma':'Open in Gamma')+' ↗</a></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:20px;margin-left:8px;">×</button>';
+      n.innerHTML='<span style="font-size:20px">\uD83C\uDFAF</span><div><strong>'+(isES?'\u00A1Deck creado!':'Deck created!')+'</strong><br><a href="'+url+'" target="_blank" style="color:#c8c0f0;text-decoration:underline;">'+(isES?'Abrir en Gamma':'Open in Gamma')+' \u2197</a></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:20px;margin-left:8px;">\u00D7</button>';
       document.body.appendChild(n);
       setTimeout(function(){if(n.parentNode)n.remove();},20000);
     } else {
-      alert(isES?'Deck generado. Revisalo en gamma.app':'Deck generated. Check gamma.app for your new presentation.');
+      console.log('Gamma response:', JSON.stringify(data).substring(0,200));
+      alert(isES?'Deck generado. Revisalo en gamma.app':'Deck generated. Check gamma.app');
     }
   })
-  .catch(function(e){btn.disabled=false;btn.textContent='📊 Build PPT';alert('Error: '+e.message);});
+  .catch(function(e){
+    // Si falla la API de Gamma, abrir gamma.app con el contenido como fallback
+    btn.disabled=false;btn.textContent='\uD83D\uDCCA Build PPT';
+    if(e.message.includes('Gamma API')||e.message.includes('401')||e.message.includes('403')){
+      // Abrir Gamma directamente — el usuario conecta su cuenta
+      var gammaUrl='https://gamma.app/create';
+      var n=document.createElement('div');
+      n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#553acc;color:#fff;padding:20px 28px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(85,58,204,0.3);max-width:480px;font-family:Inter,sans-serif;';
+      n.innerHTML='<div style="font-weight:600;margin-bottom:8px;font-size:14px">\uD83D\uDCCA '+(isES?'Crear deck en Gamma':'Create deck in Gamma')+'</div>'
+        +'<div style="font-size:12px;opacity:.85;margin-bottom:14px;">'+(isES?'El contenido est\u00E1 listo. Ab\u00ED Gamma y p\u00E9galo:':'Content is ready. Open Gamma and paste it:')+'</div>'
+        +'<button id="copyDeckBtn" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;margin-right:8px;">\uD83D\uDCCB '+(isES?'Copiar contenido':'Copy content')+'</button>'
+        +'<a href="'+gammaUrl+'" target="_blank" style="background:#fff;color:#553acc;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:600;font-size:12px;">Abrir Gamma \u2197</a>'
+        +'<button onclick="this.parentElement.remove()" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:18px;">\u00D7</button>';
+      n.style.position='fixed';
+      document.body.appendChild(n);
+      // Copiar el contenido al clipboard
+      var deckContent=window._lastDeckContent||'No content';
+      document.getElementById('copyDeckBtn').onclick=function(){
+        navigator.clipboard.writeText(deckContent).then(function(){
+          document.getElementById('copyDeckBtn').textContent='\u2705 '+(isES?'Copiado':'Copied');
+        });
+      };
+      setTimeout(function(){if(n.parentNode)n.remove();},30000);
+    } else {
+      alert('Error: '+e.message);
+    }
+  });
 }
 (function(){rebuildDropdowns();updateFn();})();
 </script>
