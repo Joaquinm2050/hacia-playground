@@ -1007,83 +1007,215 @@ function exportPDF(){
   var btn=document.getElementById('btnExportPDF');
   btn.disabled=true;btn.textContent='Generating...';
   var isES=(window.LANG||'en')==='es';
-  var sys=isES?'Eres consultor senior de HACIA. Redacta documentos ejecutivos en espanol con tono profesional orientado a resultados. Solo HTML semantico: p, h2, h3, ul, li, table, tr, td, th, strong. Sin html/body/head tags.':'You are a senior HACIA consultant. Write executive documents in English, professional results-oriented tone. Only semantic HTML: p, h2, h3, ul, li, table, tr, td, th, strong. No html/body/head tags.';
-  var prompt=(isES?'Redacta documento ejecutivo completo. Secciones: 1)Resumen Ejecutivo, 2)Situacion Actual y Diagnostico, 3)Solucion Propuesta y Arquitectura AI, 4)Stack Tecnologico Recomendado, 5)KPIs e Impacto Proyectado, 6)Estimacion de Costos y Timeline, 7)Proximos Pasos Recomendados. Tono ejecutivo formal con datos especificos. Datos del analisis:':'Write complete executive document. Sections: 1)Executive Summary, 2)Current Situation and Diagnosis, 3)Proposed Solution and AI Architecture, 4)Recommended Technology Stack, 5)Projected KPIs and Impact, 6)Cost Estimation and Timeline, 7)Recommended Next Steps. Formal executive tone with specific data. Analysis data:')+' '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis,recommendations:r.recommendations,confidence:r.confidence?{overall:r.confidence.overall,rationale:r.confidence.rationale}:null});
-  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,system:sys,messages:[{role:'user',content:prompt}]})})
+  var sys=isES
+    ?'Eres consultor senior de HACIA. Redacta documentos ejecutivos en espanol con tono profesional orientado a resultados. Solo HTML semantico: p, h2, h3, ul, li, table, tr, td, th, strong. Sin html/body/head tags.'
+    :'You are a senior HACIA consultant. Write executive documents in English, professional results-oriented tone. Only semantic HTML: p, h2, h3, ul, li, table, tr, td, th, strong. No html/body/head tags.';
+  var prompt=(isES
+    ?'Redacta documento ejecutivo completo. Secciones: 1)Resumen Ejecutivo (2-3 parrafos), 2)Situacion Actual y Diagnostico (pain points), 3)Solucion Propuesta y Arquitectura AI, 4)Stack Tecnologico Recomendado, 5)KPIs e Impacto Proyectado, 6)Estimacion de Costos y Timeline, 7)Proximos Pasos Recomendados. Tono ejecutivo formal. Datos:'
+    :'Write complete executive document. Sections: 1)Executive Summary (2-3 paragraphs), 2)Current Situation and Diagnosis (pain points), 3)Proposed Solution and AI Architecture, 4)Recommended Technology Stack, 5)Projected KPIs and Impact, 6)Cost Estimation and Timeline, 7)Recommended Next Steps. Formal executive tone. Data:')
+    +' '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis,recommendations:r.recommendations,confidence:r.confidence?{overall:r.confidence.overall,rationale:r.confidence.rationale}:null});
+  fetch('/api/analyze',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,system:sys,messages:[{role:'user',content:prompt}]})
+  })
   .then(function(res){return res.json();})
   .then(function(data){
     var body=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
     body=body.replace(/^```html?\s*/i,'').replace(/\s*```$/,'').trim();
-    var now=new Date(),dateStr=now.toLocaleDateString(isES?'es-CL':'en-US',{year:'numeric',month:'long',day:'numeric'});
+    var now=new Date();
+    var dateStr=now.toLocaleDateString(isES?'es-CL':'en-US',{year:'numeric',month:'long',day:'numeric'});
     var LOGO='https://hacia.ai/_next/image?url=%2Flogo-light.png&w=384&q=75';
-    var w=window.open('','_blank');
-    var doc=w.document;
-    doc.open();
-    doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(r.processName||'Analysis')+' - HACIA</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body></body></html>');
-    doc.close();
-    var style=doc.createElement('style');
-    style.textContent='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Inter,sans-serif;font-size:11pt;color:#0d0f1a;line-height:1.6;}@page{size:A4;margin:20mm 18mm 20mm 18mm;}.page{max-width:174mm;margin:0 auto;}.hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:2.5px solid #2356e8;margin-bottom:24px;}.hdr img{height:28px;}.hdr-meta{text-align:right;font-size:9pt;color:#565c72;font-family:monospace;}.cover{text-align:center;padding:28px 0 32px;border-bottom:1px solid #eaedf5;margin-bottom:28px;}.c-badge{font-family:monospace;font-size:8pt;letter-spacing:2px;text-transform:uppercase;color:#2356e8;margin-bottom:10px;}.c-title{font-size:22pt;font-weight:700;color:#0d0f1a;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2;}.c-sub{font-size:12pt;color:#565c72;margin-bottom:18px;}.c-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}.c-tag{font-size:8pt;font-family:monospace;padding:2px 8px;border-radius:3px;background:#eef2ff;border:1px solid #b8c7ff;color:#2356e8;text-transform:uppercase;}.impact{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;}.ic{background:#0d0f1a;padding:14px;border-radius:6px;text-align:center;}.iv{font-size:10pt;font-weight:700;color:#7ba8ff;line-height:1.3;}.il{font-size:7pt;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:4px;font-family:monospace;}h2{font-size:13pt;font-weight:700;color:#0d0f1a;margin:24px 0 8px;padding-bottom:5px;border-bottom:1px solid #d6dae6;}h3{font-size:10.5pt;font-weight:600;color:#2356e8;margin:14px 0 5px;}p{margin-bottom:9px;font-size:10.5pt;line-height:1.65;}ul{margin:6px 0 10px 16px;}li{margin-bottom:4px;font-size:10.5pt;}table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:10px 0;}th{background:#0d0f1a;color:#fff;padding:6px 9px;text-align:left;font-size:8pt;letter-spacing:1px;text-transform:uppercase;}td{padding:6px 9px;border-bottom:1px solid #eaedf5;vertical-align:top;}tr:nth-child(even) td{background:#f8f9fc;}strong{font-weight:600;}.c-bar{height:5px;background:#eaedf5;border-radius:3px;overflow:hidden;margin:6px 0 3px;}.c-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2356e8,#7ba8ff);}.footer{margin-top:28px;padding-top:10px;border-top:1px solid #d6dae6;display:flex;justify-content:space-between;align-items:center;font-size:8pt;color:#909aae;font-family:monospace;}.pbtn{position:fixed;bottom:20px;right:20px;background:#2356e8;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;z-index:999;box-shadow:0 4px 16px rgba(35,86,232,.3);}@media print{.pbtn{display:none;}-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
-    doc.head.appendChild(style);
-    var page=doc.createElement('div');page.className='page';
-    var hdrDiv=doc.createElement('div');hdrDiv.className='hdr';
-    var img=doc.createElement('img');img.src=LOGO;img.alt='HACIA';img.onerror=function(){this.style.display='none';};
-    var meta=doc.createElement('div');meta.className='hdr-meta';meta.innerHTML='<strong>'+(r.processName||'')+'</strong>'+dateStr;
-    hdrDiv.appendChild(img);hdrDiv.appendChild(meta);page.appendChild(hdrDiv);
-    var cover=doc.createElement('div');cover.className='cover';
-    cover.innerHTML='<div class="c-badge">AI Transformation Proposal - HACIA</div><div class="c-title">'+(r.processName||'AI Architecture Analysis')+'</div><div class="c-sub">'+(r.industry||'')+'</div>';
-    if(r.tags&&r.tags.length){var tags=doc.createElement('div');tags.className='c-tags';r.tags.forEach(function(t){var s=doc.createElement('span');s.className='c-tag';s.textContent=typeof t==='string'?t:'';tags.appendChild(s);});cover.appendChild(tags);}
-    page.appendChild(cover);
-    if(r.impact){var imp=doc.createElement('div');imp.className='impact';[{v:r.impact.timeSaved,l:isES?'Tiempo Ahorrado':'Time Saved'},{v:r.impact.costReduction,l:isES?'Reduccion de Costo':'Cost Reduction'},{v:r.impact.scale,l:'Scale'}].forEach(function(x){var c=doc.createElement('div');c.className='ic';c.innerHTML='<div class="iv">'+(x.v||'-').toString().substring(0,50)+'</div><div class="il">'+x.l+'</div>';imp.appendChild(c);});page.appendChild(imp);}
-    var bodyDiv=doc.createElement('div');bodyDiv.innerHTML=body;page.appendChild(bodyDiv);
-    if(r.confidence&&r.confidence.overall){var conf=doc.createElement('div');conf.innerHTML='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2><p>'+(isES?'Puntaje':'Score')+': <strong>'+r.confidence.overall+'/100</strong></p><div class="c-bar"><div class="c-fill" style="width:'+r.confidence.overall+'%"></div></div>'+(r.confidence.rationale?'<p style="font-size:9.5pt;color:#565c72;margin-top:6px;">'+r.confidence.rationale+'</p>':'');page.appendChild(conf);}
-    var footer=doc.createElement('div');footer.className='footer';footer.innerHTML='<span style="font-weight:600;letter-spacing:1px">CONFIDENCIAL - HACIA '+now.getFullYear()+'</span><span>hacia.ai</span><span>'+dateStr+'</span>';page.appendChild(footer);
-    doc.body.appendChild(page);
-    var pbtn=doc.createElement('button');pbtn.className='pbtn';pbtn.textContent=isES?'Guardar como PDF':'Save as PDF';pbtn.onclick=function(){w.print();};doc.body.appendChild(pbtn);
-    btn.disabled=false;btn.textContent='\uD83D\uDCC4 Export PDF';
+    // Construir HTML completo como string para Blob
+    var css=[
+      '*{box-sizing:border-box;margin:0;padding:0;}',
+      'body{font-family:Inter,sans-serif;font-size:11pt;color:#0d0f1a;line-height:1.6;background:#fff;}',
+      '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");',
+      '@page{size:A4;margin:20mm 18mm 20mm 18mm;}',
+      '.page{max-width:174mm;margin:0 auto;padding:20px;}',
+      '.hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:2.5px solid #2356e8;margin-bottom:24px;}',
+      '.hdr img{height:28px;}',
+      '.hdr-meta{text-align:right;font-size:9pt;color:#565c72;font-family:monospace;}',
+      '.cover{text-align:center;padding:28px 0 32px;border-bottom:1px solid #eaedf5;margin-bottom:28px;}',
+      '.c-badge{font-family:monospace;font-size:8pt;letter-spacing:2px;text-transform:uppercase;color:#2356e8;margin-bottom:10px;}',
+      '.c-title{font-size:22pt;font-weight:700;color:#0d0f1a;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2;}',
+      '.c-sub{font-size:12pt;color:#565c72;margin-bottom:18px;}',
+      '.c-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}',
+      '.c-tag{font-size:8pt;font-family:monospace;padding:2px 8px;border-radius:3px;background:#eef2ff;border:1px solid #b8c7ff;color:#2356e8;text-transform:uppercase;}',
+      '.impact{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;}',
+      '.ic{background:#0d0f1a;padding:14px;border-radius:6px;text-align:center;}',
+      '.iv{font-size:10pt;font-weight:700;color:#7ba8ff;line-height:1.3;}',
+      '.il{font-size:7pt;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:4px;font-family:monospace;}',
+      'h2{font-size:13pt;font-weight:700;color:#0d0f1a;margin:24px 0 8px;padding-bottom:5px;border-bottom:1px solid #d6dae6;}',
+      'h3{font-size:10.5pt;font-weight:600;color:#2356e8;margin:14px 0 5px;}',
+      'p{margin-bottom:9px;font-size:10.5pt;line-height:1.65;}',
+      'ul{margin:6px 0 10px 16px;}li{margin-bottom:4px;font-size:10.5pt;}',
+      'table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:10px 0;}',
+      'th{background:#0d0f1a;color:#fff;padding:6px 9px;text-align:left;font-size:8pt;letter-spacing:1px;text-transform:uppercase;}',
+      'td{padding:6px 9px;border-bottom:1px solid #eaedf5;vertical-align:top;}',
+      'tr:nth-child(even) td{background:#f8f9fc;}',
+      'strong{font-weight:600;}',
+      '.c-bar{height:5px;background:#eaedf5;border-radius:3px;overflow:hidden;margin:6px 0 3px;}',
+      '.c-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2356e8,#7ba8ff);}',
+      '.footer{margin-top:28px;padding-top:10px;border-top:1px solid #d6dae6;display:flex;justify-content:space-between;font-size:8pt;color:#909aae;font-family:monospace;}',
+      '.pbtn{position:fixed;bottom:20px;right:20px;background:#2356e8;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(35,86,232,.3);}',
+      '@media print{.pbtn{display:none;}}'
+    ].join('');
+    // Construir HTML del documento
+    var html='<!DOCTYPE html><html lang="'+(isES?'es':'en')+'">';
+    html+='<head><meta charset="UTF-8"><title>'+(r.processName||'Analysis')+' - HACIA</title>';
+    html+='<style>'+css+'</style></head><body>';
+    html+='<div class="page">';
+    // Header
+    html+='<div class="hdr">';
+    html+='<img src="'+LOGO+'" alt="HACIA" onerror="this.style.display='none'">';
+    html+='<div class="hdr-meta"><strong>'+(r.processName||'')+'</strong><br>'+dateStr+'</div>';
+    html+='</div>';
+    // Portada
+    html+='<div class="cover">';
+    html+='<div class="c-badge">AI Transformation Proposal — HACIA</div>';
+    html+='<div class="c-title">'+(r.processName||'AI Architecture Analysis')+'</div>';
+    html+='<div class="c-sub">'+(r.industry||'')+'</div>';
+    if(r.tags&&r.tags.length){
+      html+='<div class="c-tags">';
+      r.tags.forEach(function(t){html+='<span class="c-tag">'+(typeof t==='string'?t:'')+'</span>';});
+      html+='</div>';
+    }
+    html+='</div>';
+    // Impact grid
+    if(r.impact){
+      html+='<div class="impact">';
+      [{v:r.impact.timeSaved,l:isES?'Tiempo Ahorrado':'Time Saved'},{v:r.impact.costReduction,l:isES?'Reduccion de Costo':'Cost Reduction'},{v:r.impact.scale,l:'Scale'}].forEach(function(x){
+        html+='<div class="ic"><div class="iv">'+(x.v||'-').toString().substring(0,50)+'</div><div class="il">'+x.l+'</div></div>';
+      });
+      html+='</div>';
+    }
+    // Cuerpo generado por Claude
+    html+=body;
+    // Confidence
+    if(r.confidence&&r.confidence.overall){
+      html+='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2>';
+      html+='<p>'+(isES?'Puntaje general':'Overall score')+': <strong>'+r.confidence.overall+'/100</strong></p>';
+      html+='<div class="c-bar"><div class="c-fill" style="width:'+r.confidence.overall+'%"></div></div>';
+      if(r.confidence.rationale)html+='<p style="font-size:9.5pt;color:#565c72;margin-top:6px;">'+r.confidence.rationale+'</p>';
+    }
+    // Footer
+    html+='<div class="footer">';
+    html+='<span style="font-weight:600;letter-spacing:1px">CONFIDENCIAL — HACIA '+now.getFullYear()+'</span>';
+    html+='<span>hacia.ai</span><span>'+dateStr+'</span>';
+    html+='</div>';
+    html+='</div>';
+    // Boton imprimir
+    html+='<button class="pbtn" onclick="window.print()">'+(isES?'Guardar como PDF':'Save as PDF')+'</button>';
+    html+='</body></html>';
+    // Abrir via Blob URL — nunca bloqueado por popup blockers
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.target='_blank';a.rel='noopener';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+    btn.disabled=false;btn.textContent='📄 Export PDF';
   })
-  .catch(function(e){btn.disabled=false;btn.textContent='\uD83D\uDCC4 Export PDF';alert('Error: '+e.message);});
+  .catch(function(e){btn.disabled=false;btn.textContent='📄 Export PDF';alert('Error: '+e.message);});
 }
-
 function exportPPT(){
   var r=window._lastAnalysis;
   if(!r){alert('Run an analysis first.');return;}
   var btn=document.getElementById('btnExportPPT');
   btn.disabled=true;btn.textContent='Building deck...';
   var isES=(window.LANG||'en')==='es';
-  var deckPrompt='Create content for an 8-slide executive presentation about AI transformation. Return ONLY valid JSON: {"title":string,"subtitle":string,"slides":[{"title":string,"content":string}]}. Slides: 1-Cover/Title, 2-Current Situation, 3-Pain Points Diagnosis, 4-AI Architecture Solution, 5-Technology Stack, 6-Projected KPIs, 7-Investment and Timeline, 8-Next Steps. Language: '+(isES?'Spanish':'English')+'. Use business-focused bullet points. Data: '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis?r.kpis.slice(0,3):[],recommendations:r.recommendations?r.recommendations.slice(0,3):[]});
-  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,system:'Return only raw valid JSON. No markdown.',messages:[{role:'user',content:deckPrompt}]})})
+  // Prompt mas simple y robusto — menos campos = JSON mas limpio
+  var deckPrompt='Create an 8-slide executive presentation about AI transformation for a client. '
+    +'Return ONLY a JSON object (no markdown, no explanation): '
+    +'{"title":"string","subtitle":"string","slides":[{"title":"string","content":"string"},...]}'
+    +' where content uses simple bullet points with - prefix. '
+    +'Slide titles: 1.Cover, 2.Current Situation, 3.Pain Diagnosis, 4.AI Architecture, 5.Tech Stack, 6.KPIs, 7.Investment, 8.Next Steps. '
+    +'Language: '+(isES?'Spanish':'English')+'. '
+    +'Keep all strings short. No special characters, no quotes inside strings. '
+    +'Client data: processName='+JSON.stringify(r.processName||'')+', industry='+JSON.stringify(r.industry||'')+', '
+    +'impact='+JSON.stringify(r.impact||{})+', '
+    +'recommendations='+JSON.stringify((r.recommendations||[]).slice(0,2).map(function(x){return typeof x==='string'?x:(x.text||'');}));
+  fetch('/api/analyze',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,system:'Return only raw valid JSON. No markdown, no code fences, no explanation.',messages:[{role:'user',content:deckPrompt}]})
+  })
   .then(function(res){return res.json();})
   .then(function(data){
     var raw=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
+    // Limpiar agresivamente
     raw=raw.replace(/^```json?\s*/i,'').replace(/\s*```$/,'').trim();
     var s=raw.indexOf('{'),e=raw.lastIndexOf('}');
-    var deck=JSON.parse(raw.substring(s,e+1));
-    var inputText='# '+deck.title+'\n\n**'+deck.subtitle+'**\n\n---\n*Prepared by HACIA - AI Transformation Partner | hacia.ai*\n---\n\n';
-    (deck.slides||[]).forEach(function(sl){inputText+='## '+sl.title+'\n\n'+sl.content+'\n\n';});
-    inputText+='---\n*hacia.ai | AI Transformation for LATAM businesses*';
-    return fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:'Use the Gamma MCP tool to create a presentation. Call the generate tool with the content provided.',messages:[{role:'user',content:'Create a professional dark-themed executive presentation. Language: '+(isES?'es':'en')+'. Content:\n\n'+inputText}],mcp_servers:[{type:'url',url:'https://mcp.gamma.app/mcp',name:'gamma-mcp'}]})});
+    if(s===-1||e===-1){throw new Error('No JSON found in response');}
+    var deck;
+    try{deck=JSON.parse(raw.substring(s,e+1));}
+    catch(jsonErr){
+      // Intentar reparar JSON truncado
+      var partial=raw.substring(s);
+      // Cerrar arrays y objetos abiertos
+      var opens=0,openo=0;
+      for(var i=0;i<partial.length;i++){
+        if(partial[i]==='[')opens++;else if(partial[i]===']')opens--;
+        if(partial[i]==='{')openo++;else if(partial[i]==='}')openo--;
+      }
+      var fix=partial;
+      // Cerrar string abierto si hay
+      if((fix.match(/"/g)||[]).length%2!==0)fix+='"';
+      while(opens>0){fix+=']';opens--;}
+      while(openo>0){fix+='}';openo--;}
+      try{deck=JSON.parse(fix);}
+      catch(e2){
+        // Construir deck minimo manualmente
+        deck={title:r.processName||'AI Transformation',subtitle:r.industry||'',slides:[
+          {title:isES?'Presentacion':'Cover',content:r.summary||''},
+          {title:isES?'Situacion Actual':'Current State',content:(r.impact&&r.impact.timeSaved)||''},
+          {title:isES?'Solucion AI':'AI Solution',content:''},
+          {title:isES?'Proximos Pasos':'Next Steps',content:''}
+        ]};
+      }
+    }
+    // Construir inputText para Gamma
+    var inputText='# '+(deck.title||r.processName||'AI Transformation')+'\n\n';
+    inputText+='**'+(deck.subtitle||r.industry||'')+'**\n\n';
+    inputText+='---\n*Prepared by HACIA — AI Transformation Partner | hacia.ai*\n---\n\n';
+    (deck.slides||[]).forEach(function(sl){
+      if(!sl||!sl.title)return;
+      inputText+='## '+sl.title+'\n\n'+(sl.content||'')+'\n\n';
+    });
+    inputText+='---\n*hacia.ai | AI Transformation for LATAM*';
+    // Llamar Gamma MCP
+    return fetch('/api/analyze',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:2000,
+        system:'Use the Gamma MCP generate tool to create a presentation with the content provided. Return the gammaUrl.',
+        messages:[{role:'user',content:'Create a professional executive presentation. Use dark professional theme. Language: '+(isES?'es':'en')+'. Content:\n\n'+inputText}],
+        mcp_servers:[{type:'url',url:'https://mcp.gamma.app/mcp',name:'gamma-mcp'}]
+      })
+    });
   })
   .then(function(res){return res.json();})
   .then(function(data){
     var text=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join(' ');
     var toolResults=(data.content||[]).filter(function(b){return b.type==='mcp_tool_result';});
     var gammaUrl=null;
-    toolResults.forEach(function(tr){var c=(tr.content||[]).map(function(x){return x.text||'';}).join(' ');var m=c.match(/https:\/\/gamma\.app\/[^\s"')]+/);if(m)gammaUrl=m[0];});
+    toolResults.forEach(function(tr){
+      var c=(tr.content||[]).map(function(x){return x.text||'';}).join(' ');
+      var m=c.match(/https:\/\/gamma\.app\/[^\s"')]+/);if(m)gammaUrl=m[0];
+    });
     if(!gammaUrl){var m=text.match(/https:\/\/gamma\.app\/[^\s"')]+/);if(m)gammaUrl=m[0];}
-    btn.disabled=false;btn.textContent='&#x1F4CA; Build PPT';
+    btn.disabled=false;btn.textContent='📊 Build PPT';
     if(gammaUrl){
       var n=document.createElement('div');
-      n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#553acc;color:#fff;padding:16px 24px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(85,58,204,0.3);display:flex;gap:12px;align-items:center;max-width:500px;';
-      n.innerHTML='<span style="font-size:20px">&#x1F3AF;</span><div><strong>'+(isES?'Deck creado!':'Deck created!')+'</strong><br><a href="'+gammaUrl+'" target="_blank" style="color:#c8c0f0;text-decoration:underline;">'+(isES?'Abrir en Gamma':'Open in Gamma')+' &#x2197;</a></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;margin-left:8px;">&#x2715;</button>';
+      n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#553acc;color:#fff;padding:16px 24px;border-radius:10px;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(85,58,204,0.3);display:flex;gap:12px;align-items:center;max-width:500px;font-family:Inter,sans-serif;';
+      n.innerHTML='<span style="font-size:20px">🎯</span><div><strong>'+(isES?'Deck creado!':'Deck created!')+'</strong><br><a href="'+gammaUrl+'" target="_blank" style="color:#c8c0f0;text-decoration:underline;">'+(isES?'Abrir en Gamma':'Open in Gamma')+' ↗</a></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:20px;margin-left:8px;">×</button>';
       document.body.appendChild(n);
       setTimeout(function(){if(n.parentNode)n.remove();},20000);
     } else {
-      alert(isES?'Deck generado. Revisalo en gamma.app':'Deck generated. Check gamma.app');
+      alert(isES?'Deck generado. Revisalo en gamma.app':'Deck generated. Check gamma.app for your new presentation.');
     }
   })
-  .catch(function(e){btn.disabled=false;btn.textContent='&#x1F4CA; Build PPT';alert('Error: '+e.message);});
+  .catch(function(e){btn.disabled=false;btn.textContent='📊 Build PPT';alert('Error: '+e.message);});
 }
-
 (function(){rebuildDropdowns();updateFn();})();
 </script>
 </body>
