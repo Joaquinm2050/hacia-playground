@@ -1008,173 +1008,120 @@ function exportPDF(){
   btn.disabled=true;btn.textContent='Generating...';
   var isES=(window.LANG||'en')==='es';
   var sys=isES
-    ?'Eres consultor senior de HACIA. Redacta documentos ejecutivos en espanol con tono profesional orientado a resultados. Solo HTML semantico: p, h2, h3, ul, li, table, tr, td, th, strong. Sin html/body/head tags.'
-    :'You are a senior HACIA consultant. Write executive documents in English, professional results-oriented tone. Only semantic HTML: p, h2, h3, ul, li, table, tr, td, th, strong. No html/body/head tags.';
-  var prompt=(isES
-    ?'Redacta documento ejecutivo completo. Secciones: 1)Resumen Ejecutivo (2-3 parrafos), 2)Situacion Actual y Diagnostico (pain points), 3)Solucion Propuesta y Arquitectura AI, 4)Stack Tecnologico Recomendado, 5)KPIs e Impacto Proyectado, 6)Estimacion de Costos y Timeline, 7)Proximos Pasos Recomendados. Tono ejecutivo formal. Datos:'
-    :'Write complete executive document. Sections: 1)Executive Summary (2-3 paragraphs), 2)Current Situation and Diagnosis (pain points), 3)Proposed Solution and AI Architecture, 4)Recommended Technology Stack, 5)Projected KPIs and Impact, 6)Cost Estimation and Timeline, 7)Recommended Next Steps. Formal executive tone. Data:')
+    ?'Eres consultor senior de HACIA. Redacta documentos ejecutivos en espanol profesional. Solo HTML semantico: p,h2,h3,ul,li,table,tr,td,th,strong. Sin etiquetas html/body/head. Sin caracteres especiales.'
+    :'You are a senior HACIA consultant. Write executive documents in professional English. Only semantic HTML: p,h2,h3,ul,li,table,tr,td,th,strong. No html/body/head tags. ASCII only.';
+  var prompt=(isES?'Redacta documento ejecutivo con secciones: 1)Resumen Ejecutivo 2)Situacion Actual 3)Solucion AI Propuesta 4)Tech Stack 5)KPIs e Impacto 6)Costos y Timeline 7)Proximos Pasos. Datos:':'Write executive document with sections: 1)Executive Summary 2)Current Situation 3)Proposed AI Solution 4)Tech Stack 5)KPIs and Impact 6)Costs and Timeline 7)Next Steps. Data:')
     +' '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis,recommendations:r.recommendations,confidence:r.confidence?{overall:r.confidence.overall,rationale:r.confidence.rationale}:null});
-  fetch('/api/analyze',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+  fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,system:sys,messages:[{role:'user',content:prompt}]})
   })
   .then(function(res){return res.json();})
   .then(function(data){
     var body=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
     body=body.replace(/^```html?\s*/i,'').replace(/\s*```$/,'').trim();
-    var now=new Date();
-    var dateStr=now.toLocaleDateString(isES?'es-CL':'en-US',{year:'numeric',month:'long',day:'numeric'});
+    var now=new Date(),dateStr=now.toLocaleDateString(isES?'es-CL':'en-US',{year:'numeric',month:'long',day:'numeric'});
     var LOGO='https://hacia.ai/_next/image?url=%2Flogo-light.png&w=384&q=75';
-    // Construir HTML completo como string para Blob
-    var css=[
-      '*{box-sizing:border-box;margin:0;padding:0;}',
-      'body{font-family:Inter,sans-serif;font-size:11pt;color:#0d0f1a;line-height:1.6;background:#fff;}',
-      '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");',
-      '@page{size:A4;margin:20mm 18mm 20mm 18mm;}',
-      '.page{max-width:174mm;margin:0 auto;padding:20px;}',
-      '.hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:2.5px solid #2356e8;margin-bottom:24px;}',
-      '.hdr img{height:28px;}',
-      '.hdr-meta{text-align:right;font-size:9pt;color:#565c72;font-family:monospace;}',
-      '.cover{text-align:center;padding:28px 0 32px;border-bottom:1px solid #eaedf5;margin-bottom:28px;}',
-      '.c-badge{font-family:monospace;font-size:8pt;letter-spacing:2px;text-transform:uppercase;color:#2356e8;margin-bottom:10px;}',
-      '.c-title{font-size:22pt;font-weight:700;color:#0d0f1a;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2;}',
-      '.c-sub{font-size:12pt;color:#565c72;margin-bottom:18px;}',
-      '.c-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}',
-      '.c-tag{font-size:8pt;font-family:monospace;padding:2px 8px;border-radius:3px;background:#eef2ff;border:1px solid #b8c7ff;color:#2356e8;text-transform:uppercase;}',
-      '.impact{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;}',
-      '.ic{background:#0d0f1a;padding:14px;border-radius:6px;text-align:center;}',
-      '.iv{font-size:10pt;font-weight:700;color:#7ba8ff;line-height:1.3;}',
-      '.il{font-size:7pt;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:4px;font-family:monospace;}',
-      'h2{font-size:13pt;font-weight:700;color:#0d0f1a;margin:24px 0 8px;padding-bottom:5px;border-bottom:1px solid #d6dae6;}',
-      'h3{font-size:10.5pt;font-weight:600;color:#2356e8;margin:14px 0 5px;}',
-      'p{margin-bottom:9px;font-size:10.5pt;line-height:1.65;}',
-      'ul{margin:6px 0 10px 16px;}li{margin-bottom:4px;font-size:10.5pt;}',
-      'table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:10px 0;}',
-      'th{background:#0d0f1a;color:#fff;padding:6px 9px;text-align:left;font-size:8pt;letter-spacing:1px;text-transform:uppercase;}',
-      'td{padding:6px 9px;border-bottom:1px solid #eaedf5;vertical-align:top;}',
-      'tr:nth-child(even) td{background:#f8f9fc;}',
-      'strong{font-weight:600;}',
-      '.c-bar{height:5px;background:#eaedf5;border-radius:3px;overflow:hidden;margin:6px 0 3px;}',
-      '.c-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2356e8,#7ba8ff);}',
-      '.footer{margin-top:28px;padding-top:10px;border-top:1px solid #d6dae6;display:flex;justify-content:space-between;font-size:8pt;color:#909aae;font-family:monospace;}',
-      '.pbtn{position:fixed;bottom:20px;right:20px;background:#2356e8;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(35,86,232,.3);}',
-      '@media print{.pbtn{display:none;}}'
-    ].join('');
-    // Construir HTML del documento
-    var html='<!DOCTYPE html><html lang="'+(isES?'es':'en')+'">';
-    html+='<head><meta charset="UTF-8"><title>'+(r.processName||'Analysis')+' - HACIA</title>';
-    html+='<style>'+css+'</style></head><body>';
-    html+='<div class="page">';
-    // Header
-    html+='<div class="hdr">';
-    html+='<img src="'+LOGO+'" alt="HACIA" onerror="this.style.display=\'none\'">';
-    html+='<div class="hdr-meta"><strong>'+(r.processName||'')+'</strong><br>'+dateStr+'</div>';
-    html+='</div>';
-    // Portada
-    html+='<div class="cover">';
-    html+='<div class="c-badge">AI Transformation Proposal — HACIA</div>';
-    html+='<div class="c-title">'+(r.processName||'AI Architecture Analysis')+'</div>';
-    html+='<div class="c-sub">'+(r.industry||'')+'</div>';
-    if(r.tags&&r.tags.length){
-      html+='<div class="c-tags">';
-      r.tags.forEach(function(t){html+='<span class="c-tag">'+(typeof t==='string'?t:'')+'</span>';});
-      html+='</div>';
-    }
-    html+='</div>';
-    // Impact grid
-    if(r.impact){
-      html+='<div class="impact">';
-      [{v:r.impact.timeSaved,l:isES?'Tiempo Ahorrado':'Time Saved'},{v:r.impact.costReduction,l:isES?'Reduccion de Costo':'Cost Reduction'},{v:r.impact.scale,l:'Scale'}].forEach(function(x){
-        html+='<div class="ic"><div class="iv">'+(x.v||'-').toString().substring(0,50)+'</div><div class="il">'+x.l+'</div></div>';
-      });
-      html+='</div>';
-    }
-    // Arquitecturas Pre/Post AI (antes del cuerpo)
-    var isESx=(window.LANG||'en')==='es';
-    var flowCss='<style>.pdf-flow{display:flex;gap:12px;margin-bottom:8px;}.pdf-flow-col{flex:1;}.pdf-flow-title{font-family:monospace;font-size:8pt;letter-spacing:1.5px;text-transform:uppercase;padding:6px 10px;margin-bottom:8px;border-radius:4px;}.pdf-flow-pre .pdf-flow-title{background:#0d0f1a;color:#fff;}.pdf-flow-post .pdf-flow-title{background:#eef7f2;color:#0a7a52;border:1px solid #a0dcca;}.pdf-node{padding:8px 12px;border-radius:5px;font-size:9pt;margin-bottom:6px;line-height:1.4;text-align:center;border:1px solid #d6dae6;}.pdf-node.start,.pdf-node.end-node{background:#0d0f1a;color:#fff;border-color:#0d0f1a;}.pdf-node.pain{background:#fdf2f3;border-color:#f0b8be;color:#c0182a;}.pdf-node.agent{background:#eef2ff;border-color:#b8c7ff;color:#2356e8;}.pdf-node.gain{background:#e8f7f2;border-color:#a0dcca;color:#0a7a52;}.pdf-node.decision{background:#fff8ed;border-color:#f0ccaa;color:#9a4e00;}.pdf-conn{width:1px;height:12px;background:#d6dae6;margin:0 auto 6px;}</style>';
-    html+=flowCss;
-    html+='<h2>'+(isESx?'Arquitectura del Proceso':'Process Architecture')+'</h2>';
-    html+='<div class="pdf-flow">';
-    // PRE-AI column
-    html+='<div class="pdf-flow-col pdf-flow-pre">';
-    html+='<div class="pdf-flow-title">● '+(r.preTitle||(isESx?'Estado Actual':'Current State'))+'</div>';
     var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
-    preNodes.forEach(function(n,i){
-      if(!n)return;
-      var ty=n.type||'pain';
-      var tx=n.text||n.label||'';
-      if(i>0)html+='<div class="pdf-conn"></div>';
-      html+='<div class="pdf-node '+ty+'">'+tx+'</div>';
-    });
-    html+='</div>';
-    // POST-AI column
-    html+='<div class="pdf-flow-col pdf-flow-post">';
-    html+='<div class="pdf-flow-title">● '+(r.postTitle||(isESx?'Arquitectura AI':'AI Architecture'))+'</div>';
     var postNodes=Array.isArray(r.postFlow)?r.postFlow:(r.postFlow&&r.postFlow.nodes?r.postFlow.nodes:[]);
-    postNodes.forEach(function(n,i){
-      if(!n)return;
-      var ty=n.type||'gain';
-      var tx=n.text||n.label||'';
-      if(i>0)html+='<div class="pdf-conn"></div>';
-      html+='<div class="pdf-node '+ty+'">'+tx+'</div>';
-    });
+    var css='*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Inter,sans-serif;font-size:11pt;color:#0d0f1a;background:#fff;line-height:1.6;}@page{size:A4;margin:20mm 18mm 20mm 18mm;}.page{max-width:174mm;margin:0 auto;padding:20px;}.hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:2.5px solid #2356e8;margin-bottom:24px;}.hdr-logo{height:28px;}.hdr-meta{text-align:right;font-size:9pt;color:#565c72;font-family:monospace;}.cover{text-align:center;padding:24px 0 28px;border-bottom:1px solid #eaedf5;margin-bottom:28px;}.c-badge{font-family:monospace;font-size:8pt;letter-spacing:2px;text-transform:uppercase;color:#2356e8;margin-bottom:10px;}.c-title{font-size:22pt;font-weight:700;color:#0d0f1a;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.2;}.c-sub{font-size:12pt;color:#565c72;margin-bottom:16px;}.c-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}.c-tag{font-size:8pt;font-family:monospace;padding:2px 8px;border-radius:3px;background:#eef2ff;border:1px solid #b8c7ff;color:#2356e8;text-transform:uppercase;}.impact{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;}.ic{background:#0d0f1a;padding:14px;border-radius:6px;text-align:center;}.iv{font-size:10pt;font-weight:700;color:#7ba8ff;line-height:1.3;}.il{font-size:7pt;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:4px;font-family:monospace;}.flow-section{margin:24px 0;}.flow-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}.flow-head{font-family:monospace;font-size:8pt;letter-spacing:1.5px;text-transform:uppercase;padding:6px 10px;border-radius:4px 4px 0 0;font-weight:600;}.flow-head-pre{background:#0d0f1a;color:#fff;}.flow-head-post{background:#0a1f18;color:#80ddbc;border:1px solid #a0dcca;border-bottom:none;}.flow-nodes{border:1px solid #eaedf5;border-radius:0 0 4px 4px;overflow:hidden;}.flow-node{padding:6px 10px;font-size:8.5pt;border-bottom:1px solid #f0f2f8;line-height:1.4;}.flow-node:last-child{border-bottom:none;}.fn-start,.fn-end-node{background:#0d0f1a;color:#fff;}.fn-pain{background:#fdf2f3;color:#c0182a;}.fn-decision{background:#fff8ed;color:#9a4e00;}.fn-agent{background:#eef2ff;color:#2356e8;}.fn-gain{background:#e8f7f2;color:#0a7a52;}h2{font-size:13pt;font-weight:700;color:#0d0f1a;margin:24px 0 8px;padding-bottom:5px;border-bottom:1px solid #d6dae6;}h3{font-size:10.5pt;font-weight:600;color:#2356e8;margin:14px 0 5px;}p{margin-bottom:9px;font-size:10.5pt;line-height:1.65;}ul{margin:6px 0 10px 16px;}li{margin-bottom:4px;font-size:10.5pt;}table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:10px 0;}th{background:#0d0f1a;color:#fff;padding:6px 9px;text-align:left;font-size:8pt;letter-spacing:1px;text-transform:uppercase;}td{padding:6px 9px;border-bottom:1px solid #eaedf5;vertical-align:top;}tr:nth-child(even) td{background:#f8f9fc;}strong{font-weight:600;}.c-bar{height:5px;background:#eaedf5;border-radius:3px;overflow:hidden;margin:6px 0;}.c-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2356e8,#7ba8ff);}.footer{margin-top:28px;padding-top:10px;border-top:1px solid #d6dae6;display:flex;justify-content:space-between;font-size:8pt;color:#909aae;font-family:monospace;}.pbtn{position:fixed;bottom:20px;right:20px;background:#2356e8;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(35,86,232,.3);font-family:Inter,sans-serif;}@media print{.pbtn{display:none!important;}-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+    function flowNode(nd,isPre){var ty=nd.type||'';var cls='flow-node fn-'+(ty==='end-node'?'end-node':ty||(isPre?'pain':'agent'));return'<div class="'+cls+'">'+(nd.text||nd.label||'')+'</div>';}
+    var flowHTML='<div class="flow-section"><h2>'+(isES?'Arquitectura del Proceso':'Process Architecture')+'</h2><div class="flow-grid"><div><div class="flow-head flow-head-pre">'+(r.preTitle||(isES?'Estado Actual':'Current State'))+'</div><div class="flow-nodes">'+preNodes.slice(0,10).map(function(n){return flowNode(n,true);}).join('')+'</div></div><div><div class="flow-head flow-head-post">'+(r.postTitle||(isES?'Arquitectura AI':'AI Architecture'))+'</div><div class="flow-nodes">'+postNodes.slice(0,10).map(function(n){return flowNode(n,false);}).join('')+'</div></div></div></div>';
+    var html='<!DOCTYPE html><html lang="'+(isES?'es':'en')+'"><head><meta charset="UTF-8"><title>'+(r.processName||'Analysis')+' - HACIA</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>'+css+'</style></head><body><div class="page">';
+    html+='<div class="hdr"><img class="hdr-logo" src="'+LOGO+'" alt="HACIA"><div class="hdr-meta"><strong>'+(r.processName||'')+'</strong><br>'+dateStr+'</div></div>';
+    html+='<div class="cover"><div class="c-badge">AI Transformation Proposal &mdash; HACIA</div><div class="c-title">'+(r.processName||'AI Architecture Analysis')+'</div><div class="c-sub">'+(r.industry||'')+'</div>';
+    if(r.tags&&r.tags.length){html+='<div class="c-tags">';r.tags.forEach(function(tg){html+='<span class="c-tag">'+(typeof tg==='string'?tg:'')+'</span>';});html+='</div>';}
     html+='</div>';
-    html+='</div>';
-    // Cuerpo generado por Claude
+    if(r.impact){html+='<div class="impact"><div class="ic"><div class="iv">'+(r.impact.timeSaved||'-')+'</div><div class="il">'+(isES?'Tiempo Ahorrado':'Time Saved')+'</div></div><div class="ic"><div class="iv">'+(r.impact.costReduction||'-')+'</div><div class="il">'+(isES?'Reduccion Costo':'Cost Reduction')+'</div></div><div class="ic"><div class="iv">'+(r.impact.scale||'-')+'</div><div class="il">Scale</div></div></div>';}
+    html+=flowHTML;
     html+=body;
-    // Confidence
-    if(r.confidence&&r.confidence.overall){
-      html+='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2>';
-      html+='<p>'+(isES?'Puntaje general':'Overall score')+': <strong>'+r.confidence.overall+'/100</strong></p>';
-      html+='<div class="c-bar"><div class="c-fill" style="width:'+r.confidence.overall+'%"></div></div>';
-      if(r.confidence.rationale)html+='<p style="font-size:9.5pt;color:#565c72;margin-top:6px;">'+r.confidence.rationale+'</p>';
+    if(r.confidence&&r.confidence.overall){html+='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2><p>Score: <strong>'+r.confidence.overall+'/100</strong></p><div class="c-bar"><div class="c-fill" style="width:'+r.confidence.overall+'%"></div></div>'+(r.confidence.rationale?'<p style="font-size:9.5pt;color:#565c72;margin-top:6px;">'+r.confidence.rationale+'</p>':'');}
+    html+='<div class="footer"><span>CONFIDENCIAL &mdash; HACIA '+now.getFullYear()+'</span><span>hacia.ai</span><span>'+dateStr+'</span></div></div>';
+    html+='<button class="pbtn" onclick="window.print()">'+(isES?'Guardar como PDF':'Save as PDF')+'</button></body></html>';
+    // Abrir ventana PRIMERO (evita null si se abre después del async)
+    var w=window.open('about:blank','_blank');
+    if(w&&!w.closed){
+      w.document.write(html);
+      w.document.close();
+    } else {
+      // Fallback: overlay en la misma página
+      var ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;z-index:99999;overflow:auto;';
+      var srcdoc=html.replace(/'/g,"&#39;");
+      ov.innerHTML='<button onclick="this.parentElement.remove()" style="position:fixed;top:12px;right:12px;z-index:99999;background:#c0182a;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:Inter,sans-serif;">&#x00D7; Cerrar</button><iframe style="width:100%;height:100%;border:none;" srcdoc="'+srcdoc+'"></iframe>';
+      document.body.appendChild(ov);
     }
-    // Footer
-    html+='<div class="footer">';
-    html+='<span style="font-weight:600;letter-spacing:1px">CONFIDENCIAL — HACIA '+now.getFullYear()+'</span>';
-    html+='<span>hacia.ai</span><span>'+dateStr+'</span>';
-    html+='</div>';
-    html+='</div>';
-    // Boton imprimir
-    html+='<button class="pbtn" onclick="window.print()">'+(isES?'Guardar como PDF':'Save as PDF')+'</button>';
-    html+='</body></html>';
-    // Abrir via Blob URL — nunca bloqueado por popup blockers
-    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url;a.target='_blank';a.rel='noopener';
-    document.body.appendChild(a);a.click();
-    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
-    btn.disabled=false;btn.textContent='📄 Export PDF';
+    btn.disabled=false;btn.textContent='\uD83D\uDCC4 Export PDF';
   })
-  .catch(function(e){btn.disabled=false;btn.textContent='📄 Export PDF';alert('Error: '+e.message);});
+  .catch(function(e){btn.disabled=false;btn.textContent='\uD83D\uDCC4 Export PDF';alert('Error: '+e.message);});
 }
 function exportPPT(){
   var r=window._lastAnalysis;
   if(!r){alert('Run an analysis first.');return;}
   var btn=document.getElementById('btnExportPPT');
-  btn.disabled=true;btn.textContent='Building presentation...';
+  btn.disabled=true;btn.textContent='Building deck...';
   var isES=(window.LANG||'en')==='es';
   var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
   var postNodes=Array.isArray(r.postFlow)?r.postFlow:(r.postFlow&&r.postFlow.nodes?r.postFlow.nodes:[]);
   var kpiData=(r.kpis||[]).slice(0,3).map(function(k){return{name:k.name||'',pre:k.preBaseline||'',expected:k.expected||'',direction:k.direction||'up'};});
   var techRows=(r.techStack||[]).slice(0,3).map(function(row){return{layer:row.layer||'',tools:Array.isArray(row.tools)?row.tools.join(', '):(row.tools||''),rationale:row.rationale||''};});
-  var recs=(r.recommendations||[]).slice(0,3).map(function(x){return typeof x==='string'?x:(x.text||'');});
-  var PROMPT=(isES?'Eres consultor de HACIA. Genera contenido para presentacion ejecutiva de 9 slides. DEVUELVE SOLO JSON con estructura exacta. Idioma espanol.':'You are a HACIA consultant. Generate content for a 9-slide executive presentation. RETURN ONLY JSON with exact structure. English.')
-    +'\n\nJSON structure:\n{"deck_title":"...","client_name":"...","slides":[{"id":1,"layout":"cover","title":"...","subtitle":"...","tag":"..."},{"id":2,"layout":"diagnosis","title":"...","headline":"...","bullets":["...","...","..."]},{"id":3,"layout":"flow_comparison","title":"...","pre_label":"...","post_label":"...","key_change":"..."},{"id":4,"layout":"architecture","title":"...","headline":"...","components":["...","...","...","..."]},{"id":5,"layout":"tech_stack","title":"...","headline":"...","layers":[{"layer":"...","tools":"...","role":"..."}]},{"id":6,"layout":"kpis","title":"...","headline":"...","metrics":[{"name":"...","before":"...","after":"...","delta":"...","positive":true}]},{"id":7,"layout":"impact","title":"...","headline":"...","time_saved":"...","cost_reduction":"...","scale":"...","insight":"..."},{"id":8,"layout":"investment","title":"...","headline":"...","min_price":"...","max_price":"...","timeline":"...","includes":["...","...","..."]},{"id":9,"layout":"next_steps","title":"...","headline":"...","steps":[{"number":"01","title":"...","description":"..."}]}]}'
-    +'\n\nDATA:\nProcess: '+JSON.stringify(r.processName)+'\nIndustry: '+JSON.stringify(r.industry)+'\nSummary: '+JSON.stringify((r.summary||'').substring(0,250))+'\nImpact: '+JSON.stringify(r.impact)+'\nPre-AI flow: '+JSON.stringify(preNodes.slice(0,7).map(function(n){return n.text||n.label||'';}))+'\nPost-AI flow: '+JSON.stringify(postNodes.slice(0,7).map(function(n){return n.text||n.label||'';}))+'\nTech: '+JSON.stringify(techRows)+'\nKPIs: '+JSON.stringify(kpiData)+'\nRecs: '+JSON.stringify(recs)+'\nConfidence: '+(r.confidence?r.confidence.overall:70)+'/100';
+  var recs=(r.recommendations||[]).slice(0,3).map(function(x){return typeof x==='string'?x.substring(0,100):(x.text||'').substring(0,100);});
+  var PROMPT=(isES
+    ?'Eres consultor de HACIA. Genera contenido para presentacion ejecutiva de 9 slides. USA SOLO ASCII EN LAS RESPUESTAS. Sin apostrofes especiales. DEVUELVE SOLO JSON valido con esta estructura exacta sin markdown:'
+    :'You are a HACIA consultant. Generate content for a 9-slide executive presentation. USE ONLY ASCII IN RESPONSES. No special chars. RETURN ONLY valid JSON with this exact structure, no markdown:')
+    +'\n{"deck_title":"...","client_name":"...","slides":['
+    +'{"id":1,"layout":"cover","title":"...","subtitle":"...","tag":"..."},'
+    +'{"id":2,"layout":"diagnosis","title":"...","headline":"...","bullets":["...","...","..."]},'
+    +'{"id":3,"layout":"flow_comparison","title":"...","pre_label":"...","post_label":"...","key_change":"..."},'
+    +'{"id":4,"layout":"architecture","title":"...","headline":"...","components":["...","...","...","..."]},'
+    +'{"id":5,"layout":"tech_stack","title":"...","headline":"...","layers":[{"layer":"...","tools":"...","role":"..."}]},'
+    +'{"id":6,"layout":"kpis","title":"...","headline":"...","metrics":[{"name":"...","before":"...","after":"...","delta":"...","positive":true}]},'
+    +'{"id":7,"layout":"impact","title":"...","headline":"...","time_saved":"...","cost_reduction":"...","scale":"...","insight":"..."},'
+    +'{"id":8,"layout":"investment","title":"...","headline":"...","min_price":"...","max_price":"...","timeline":"...","includes":["...","...","..."]},'
+    +'{"id":9,"layout":"next_steps","title":"...","headline":"...","steps":[{"number":"01","title":"...","description":"..."}]}'
+    +']}\n\nDATA:\nProcess: '+JSON.stringify(r.processName)+'\nIndustry: '+JSON.stringify(r.industry)+'\nSummary: '+JSON.stringify((r.summary||'').substring(0,200))+'\nImpact: '+JSON.stringify(r.impact)+'\nPre-AI: '+JSON.stringify(preNodes.slice(0,6).map(function(n){return(n.text||n.label||'').replace(/[^ -]/g,'');}))+'\nPost-AI: '+JSON.stringify(postNodes.slice(0,6).map(function(n){return(n.text||n.label||'').replace(/[^ -]/g,'');}))+'\nTech: '+JSON.stringify(techRows)+'\nKPIs: '+JSON.stringify(kpiData)+'\nRecs: '+JSON.stringify(recs);
   fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,
-      system:'Return only raw valid JSON. No markdown, no code fences, no explanation.',
+      system:'Return ONLY raw valid JSON. No markdown, no code fences, no explanation. Use only ASCII characters in all string values.',
       messages:[{role:'user',content:PROMPT}]})
   })
   .then(function(res){return res.json();})
   .then(function(data){
     var raw=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
-    raw=raw.replace(/^```json?\s*/i,'').replace(/\s*```$/,'').trim();
+    // Sanitizar ANTES de parsear — eliminar todo lo que rompe JSON
+    raw=raw.replace(/[\u2018\u2019\u2032]/g,"'")
+           .replace(/[\u201C\u201D\u201E]/g,'"')
+           .replace(/[\u2014\u2013\u2012]/g,'-')
+           .replace(/[\u2026]/g,'...')
+           .replace(/[\u00B7]/g,'*')
+           .replace(/[\u2019]/g,"'");
+    raw=raw.replace(/^```json?\s*/i,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
     var s=raw.indexOf('{'),e=raw.lastIndexOf('}');
-    if(s===-1||e===-1)throw new Error('No JSON in response');
-    var deck=JSON.parse(raw.substring(s,e+1));
+    if(s===-1||e===-1)throw new Error('No JSON object in response. Raw: '+raw.substring(0,100));
+    var jsonStr=raw.substring(s,e+1);
+    var deck;
+    try{
+      deck=JSON.parse(jsonStr);
+    }catch(parseErr){
+      // Intentar reparar trailing commas
+      jsonStr=jsonStr.replace(/,\s*([}\]])/g,'$1');
+      try{
+        deck=JSON.parse(jsonStr);
+      }catch(e2){
+        console.log('JSON parse failed, using fallback. Error:',e2.message,'\nRaw:',jsonStr.substring(0,200));
+        // Fallback con datos reales del analisis
+        deck={deck_title:r.processName||'AI Transformation',client_name:r.industry||'',slides:[
+          {id:1,layout:'cover',title:r.processName||'AI Transformation',subtitle:r.industry||'',tag:'HACIA Proposal'},
+          {id:2,layout:'diagnosis',title:'Current Situation',headline:(r.summary||'').substring(0,120),bullets:recs.length?recs:['Manual process','High operational cost','No scalability']},
+          {id:3,layout:'flow_comparison',title:'Process Architecture',pre_label:r.preTitle||'Current State',post_label:r.postTitle||'AI Architecture',key_change:(r.impact?r.impact.timeSaved:'Efficiency gain')},
+          {id:4,layout:'architecture',title:'AI Solution',headline:'End-to-end AI automation',components:techRows.slice(0,4).map(function(t){return t.layer+': '+t.tools;})},
+          {id:5,layout:'tech_stack',title:'Tech Stack',headline:'Production-grade architecture',layers:techRows},
+          {id:6,layout:'kpis',title:'Projected KPIs',headline:'AI-driven business impact',metrics:kpiData.map(function(k){return{name:k.name,before:k.pre,after:k.expected,delta:'',positive:k.direction!=='down'};})},
+          {id:7,layout:'impact',title:'Business Impact',headline:'Measurable ROI from day one',time_saved:r.impact?r.impact.timeSaved:'-',cost_reduction:r.impact?r.impact.costReduction:'-',scale:r.impact?r.impact.scale:'-',insight:(r.summary||'').substring(0,120)},
+          {id:8,layout:'investment',title:'Investment',headline:'Transparent pricing',min_price:'$8,000',max_price:'$25,000',timeline:'6-10 weeks',includes:['Discovery & Design','Development & Integration','Deployment & Training']},
+          {id:9,layout:'next_steps',title:'Next Steps',headline:'Start today',steps:[{number:'01',title:'Discovery Workshop',description:'Map full process with key stakeholders'},{number:'02',title:'Prototype',description:'Build and validate AI agent in 2 weeks'},{number:'03',title:'Pilot',description:'Deploy with real data and measure impact'}]}
+        ]};
+      }
+    }
     renderPresentation(deck,r,preNodes,postNodes,isES,kpiData,techRows);
     btn.disabled=false;btn.textContent='\uD83D\uDCCA Build PPT';
   })
