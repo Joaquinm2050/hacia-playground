@@ -465,7 +465,17 @@ textarea::placeholder{color:var(--ink-4)}
       </div>
     </div>
   </div>
-  <div class="az-card" style="margin-bottom:16px"><div class="az-card-head"><span class="az-card-icon">&#x1F3D7;</span><span class="az-card-label" id="azArchLabel">Contexto Critico para Arquitectura</span><span class="az-card-sub" id="azArchSub">Mejora la propuesta tecnica</span></div><div class="az-card-body"><div class="az-meta-grid"><div class="az-meta-field"><span class="az-meta-label">DB / ERP actual</span><input class="az-meta-input" id="azDb" type="text" placeholder="SAP, MySQL, Excel..."></div><div class="az-meta-field"><span class="az-meta-label">Cloud / Infra</span><input class="az-meta-input" id="azCloud" type="text" placeholder="AWS, Azure, on-premise..."></div><div class="az-meta-field"><span class="az-meta-label">Stack tecnologico</span><input class="az-meta-input" id="azStack" type="text" placeholder="Python, Node.js, .NET..."></div><div class="az-meta-field"><span class="az-meta-label">Frecuencia</span><input class="az-meta-input" id="azFreq" type="text" placeholder="200 facturas/mes..."></div></div></div></div>
+  <div class="az-card" style="margin-bottom:16px"><div class="az-card-head"><span class="az-card-icon">&#x1F3D7;</span><span class="az-card-label" id="azArchLabel">Contexto Critico para Arquitectura</span><span class="az-card-sub" id="azArchSub">Mejora la propuesta tecnica</span></div><div class="az-card-body"><div class="az-meta-grid"><div class="az-meta-field"><span class="az-meta-label">DB / ERP actual</span><input class="az-meta-input" id="azDb" type="text" placeholder="SAP, MySQL, Excel..."></div><div class="az-meta-field"><span class="az-meta-label">Cloud / Infra</span><input class="az-meta-input" id="azCloud" type="text" placeholder="AWS, Azure, on-premise..."></div><div class="az-meta-field"><span class="az-meta-label">Stack tecnologico</span><input class="az-meta-input" id="azStack" type="text" placeholder="Python, Node.js, .NET..."></div><div class="az-meta-field"><span class="az-meta-label">Frecuencia</span><input class="az-meta-input" id="azFreq" type="text" placeholder="200 facturas/mes..."></div>
+<div class="az-meta-field" style="grid-column:1/-1"><span class="az-meta-label" id="azLblMaturity">Madurez Tecnologica del Cliente</span>
+<select class="az-meta-input" id="azMaturity" style="appearance:auto;padding:8px 12px;background:var(--bg-2);border:1.5px solid var(--rule);border-radius:6px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:var(--ink);width:100%;cursor:pointer;">
+<option value="">Seleccionar nivel (recomendado)...</option>
+<option value="basica">🔴 Basica — Excel, papel, sin sistemas propios</option>
+<option value="media">🟡 Media — ERP legacy, BD local, algo de nube</option>
+<option value="avanzada">🟢 Avanzada — Cloud activo, APIs, equipo tecnico</option>
+<option value="enterprise">🔵 Enterprise — SAP/Oracle, infra propia, equipo IT</option>
+</select>
+<div id="azMaturityHint" style="font-size:10px;font-family:monospace;color:var(--ink-4);margin-top:5px;letter-spacing:.3px;display:none;"></div>
+</div></div></div></div>
   <div class="az-error" id="azError"><div class="az-error-title" id="azErrorTitle">Analysis failed</div><div class="az-error-msg" id="azErrorMsg"></div></div>
   <div class="az-loading" id="azLoading">
     <div class="az-loading-title" id="azLoadingTitle">Claude is analyzing the workflow...</div>
@@ -860,7 +870,12 @@ else if(isPdf){
   r.readAsDataURL(file);
 }else{var r=new FileReader();r.onload=function(e){var b64=e.target.result.split(',')[1];azFileData={type:'doc',base64:b64,mimeType:file.type,name:file.name};azFileReady=true;document.getElementById('btnAnalyze').disabled=false;nameEl.textContent='✓  '+file.name+'  ('+sizeLabel+')';};r.readAsDataURL(file);}}
 function loadFlowmapAsFile(dataUrl){var nameEl=document.getElementById('azFileName');nameEl.textContent='⏳ Optimising flowmap…';nameEl.style.display='block';document.getElementById('azDropZone').classList.add('loaded');var img=new Image();img.onload=function(){var MAX=1024;var w=img.width,h=img.height;if(w>MAX||h>MAX){var s=Math.min(MAX/w,MAX/h);w=Math.round(w*s);h=Math.round(h*s);}var cvs=document.createElement('canvas');cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(img,0,0,w,h);var resized=cvs.toDataURL('image/jpeg',0.88).split(',')[1];azFileData={type:'image',base64:resized,mimeType:'image/jpeg',name:'process-flowmap.png'};nameEl.textContent='✓  process-flowmap.png (optimised for analysis)';};img.src=dataUrl;}
-function clearAnalyzer(){azFileReady=true;['azText'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azFile').value='';document.getElementById('azFileName').style.display='none';document.getElementById('azFileName').textContent='';['azCompany','azIndustry','azScale','azPain'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azOutput').style.display='none';document.getElementById('azLoading').classList.remove('show');document.getElementById('azError').classList.remove('show');document.getElementById('azDropZone').classList.remove('loaded','drag-over');azFileData=null;}
+function clearAnalyzer(){
+  var m=document.getElementById('azMaturity');
+  if(m)m.value='';
+  var mh=document.getElementById('azMaturityHint');
+  if(mh){mh.style.display='none';mh.textContent='';}
+  azFileReady=true;['azText'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azFile').value='';document.getElementById('azFileName').style.display='none';document.getElementById('azFileName').textContent='';['azCompany','azIndustry','azScale','azPain'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('azOutput').style.display='none';document.getElementById('azLoading').classList.remove('show');document.getElementById('azError').classList.remove('show');document.getElementById('azDropZone').classList.remove('loaded','drag-over');azFileData=null;}
 var flowmapImageUrl=null;
 function clearTranscript(){document.getElementById('trText').value='';document.getElementById('flowmapOutput').classList.remove('show');flowmapImageUrl=null;}
 function generateFlowmap(){var txt=document.getElementById('trText').value.trim();if(!txt||txt.length<50){alert(LANG==='es'?'Por favor pega un transcript más largo.':'Please paste a longer transcript.');return;}document.getElementById('trLoading').classList.add('show');document.getElementById('flowmapOutput').classList.remove('show');document.getElementById('btnFlowmap').disabled=true;var pf=document.getElementById('trProgressFill');var npf=pf.cloneNode(true);pf.parentNode.replaceChild(npf,pf);var outLang=LANG==='es'?'Respond in Spanish. All node text must be in Spanish.':'Respond in English.';var prompt=outLang+'\n\nYou are a business process analyst. Analyze the following transcript and extract ALL distinct business processes mentioned.\n\nFor each process, create a flowmap with these node types:\n- start: single trigger/start node\n- step: regular manual process steps (max 8 words)\n- decision: a yes/no branching question (max 6 words, phrase as question)\n- end: outcome/end node\n\nRespond ONLY with a valid JSON array. No markdown, no preamble.\n\nSchema:\n[\n  {\n    "processName": "Short process name (3-5 words)",\n    "emoji": "single relevant emoji",\n    "nodes": [\n      {"type": "start", "text": "Trigger description"},\n      {"type": "step", "text": "What happens"},\n      {"type": "decision", "text": "Question?", "branch": [\n        {"label": "Yes", "nodes": [{"type": "step", "text": "..."}]},\n        {"label": "No", "nodes": [{"type": "step", "text": "..."}]}\n      ]},\n      {"type": "end", "text": "Outcome"}\n    ]\n  }\n]\n\nRules:\n- Extract 1 to 4 processes maximum\n- Each process should have 4-8 nodes\n- Keep node text concise (max 8 words)\n- Respond ONLY with the JSON array\n\nTRANSCRIPT:\n'+txt;var fm_timeout_id=null;
@@ -913,11 +928,13 @@ var company=document.getElementById('azCompany').value.trim();
 var industry=document.getElementById('azIndustry').value.trim();
 var scale=document.getElementById('azScale').value.trim();
 var pain=document.getElementById('azPain').value.trim();
-var meta='';
+var maturity=document.getElementById('azMaturity')?document.getElementById('azMaturity').value:'';
+  var meta='';
 if(company)meta+='Client: '+company+'\n';
 if(industry)meta+='Industry: '+industry+'\n';
 if(scale)meta+='Scale: '+scale+'\n';
-if(pain)meta+='Pain: '+pain+'\n';var _d=document.getElementById('azDb'),_c=document.getElementById('azCloud'),_s=document.getElementById('azStack'),_f=document.getElementById('azFreq');if(_d&&_d.value.trim())meta+='DB: '+_d.value.trim()+'\n';if(_c&&_c.value.trim())meta+='Cloud: '+_c.value.trim()+'\n';if(_s&&_s.value.trim())meta+='Stack: '+_s.value.trim()+'\n';if(_f&&_f.value.trim())meta+='Freq: '+_f.value.trim()+'\n';
+if(pain)meta+='Pain: '+pain+'\n';
+  if(maturity)meta+='TechMaturity: '+maturity+'\n';var _d=document.getElementById('azDb'),_c=document.getElementById('azCloud'),_s=document.getElementById('azStack'),_f=document.getElementById('azFreq');if(_d&&_d.value.trim())meta+='DB: '+_d.value.trim()+'\n';if(_c&&_c.value.trim())meta+='Cloud: '+_c.value.trim()+'\n';if(_s&&_s.value.trim())meta+='Stack: '+_s.value.trim()+'\n';if(_f&&_f.value.trim())meta+='Freq: '+_f.value.trim()+'\n';
 var textBlock='';
 if(meta)textBlock+=meta+'\n';
 if(textInput)textBlock+=textInput+'\n';
@@ -942,7 +959,34 @@ var needsVision=azFileData&&(azFileData.type==='image'||azFileData.type==='pdf')
 var mdl=needsVision?'claude-sonnet-4-5':'claude-haiku-4-5-20251001';
 var outLang=LANG==='es'?'Respond entirely in Spanish.':'Respond in English.';
 
-var prompt=outLang+'\n\nAI architect. Analyze workflow. Return ONLY raw JSON, no markdown, no explanation.\n\nRequired fields: processName, industry, summary, tags(3), impact(timeSaved,costReduction,scale), preTitle, postTitle, preFlow(nodes with type+text; types: start/pain/decision/end-node; decisions have branch:[{label,nodes}]), postFlow(nodes; types: start/agent/gain/decision/end-node), techStack(3 rows: layer,tools[],rationale), cloud, kpis(3: name,direction,unit,preBaseline,conservative,expected,bestInClass,barPct,note,source), recommendations(3), confidence(overall,inputComprehension,architectureQuality,kpiReliability as 0-100 ints, flags:[{level,title,detail}], rationale).\n\nReturn ONLY the JSON object.';
+// Calcular hint de madurez para mostrar en UI
+  var maturityHint=document.getElementById('azMaturityHint');
+  if(maturityHint&&maturity){
+    var hints={
+      basica:'Claude calibrara la solucion para entornos sin IT: n8n, Make, Airtable, herramientas no-code.',
+      media:'Claude priorizara integraciones estandar con el ERP/BD declarado. Sin migraciones de infraestructura.',
+      avanzada:'Claude puede proponer stack cloud nativo y APIs propias, alineado al cloud declarado.',
+      enterprise:'Claude propondra arquitectura enterprise: SAP BAPI/RFC, orquestacion de agentes, infra dedicada.'
+    };
+    maturityHint.textContent=hints[maturity]||'';
+    maturityHint.style.display=hints[maturity]?'block':'none';
+  }
+
+  // Construir guia de madurez tecnologica para el prompt
+  var maturityGuide='';
+  if(maturity==='basica'){
+    maturityGuide='TECH MATURITY: BASICA. The client has NO dedicated IT team, uses Excel/paper/WhatsApp as primary tools, and has NO cloud infrastructure. CRITICAL RULES FOR THIS MATURITY: (1) techStack MUST use only no-code/low-code tools: n8n, Make.com, Airtable, Google Sheets API, Zapier, Notion, WhatsApp Business API, simple webhooks. NO LangChain, NO FastAPI, NO Kubernetes, NO vector databases, NO custom ML models. (2) preFlow must show the painful manual steps in detail - this is what builds the case. (3) postFlow agents must be simple automations, not complex AI systems. (4) KPI improvements should be conservative (not aspirational). (5) investment should reflect low complexity: CLP $3M-$12M range. (6) timeline: 4-8 weeks.';
+  } else if(maturity==='media'){
+    maturityGuide='TECH MATURITY: MEDIA. The client has some ERP (SAP on-premise, legacy Oracle, local DB), basic IT support, possibly some cloud (Office 365, Google Workspace). CRITICAL RULES: (1) techStack must integrate WITH the existing systems declared - do not propose replacing them. Use their declared DB/ERP as the integration layer. (2) Prefer standard APIs, ODBC/JDBC connectors, file-based integrations over complex event streaming. (3) AI layer can be Claude API or Azure OpenAI via simple REST calls - no complex orchestration frameworks. (4) No Kubernetes, no microservices architecture unless explicitly declared. (5) investment: CLP $8M-$35M. (6) timeline: 8-14 weeks.';
+  } else if(maturity==='avanzada'){
+    maturityGuide='TECH MATURITY: AVANZADA. The client has active cloud (AWS/Azure/GCP), internal dev team, REST APIs already in use. CRITICAL RULES: (1) Use the declared cloud provider as anchor - do not mix clouds without reason. (2) Can propose LangChain/LangGraph, FastAPI, managed vector stores (Pinecone, Weaviate). (3) Integrations via native APIs and webhooks. (4) Can include CI/CD and staging environments. (5) investment: CLP $20M-$80M. (6) timeline: 10-18 weeks.';
+  } else if(maturity==='enterprise'){
+    maturityGuide='TECH MATURITY: ENTERPRISE. Client has SAP ECC/S4HANA or Oracle ERP, dedicated IT/infrastructure team, on-premise + cloud hybrid. CRITICAL RULES: (1) SAP integrations must use RFC/BAPI or SAP Cloud Connector - never direct DB access. (2) Can propose Semantic Kernel, Azure Durable Functions, enterprise service bus. (3) Security, audit trails, and change management are critical - include them in recommendations. (4) investment: CLP $50M-$200M+. (5) timeline: 16-26 weeks. (6) Always include a pilot/POC phase before full rollout.';
+  } else {
+    maturityGuide='TECH MATURITY: UNKNOWN. Infer from the declared stack/DB/cloud fields. If nothing is declared, be conservative: propose simple integrations first and mention in recommendations that a technical discovery session is needed before committing to architecture.';
+  }
+
+  var prompt=outLang+'\n\nYou are a senior AI consultant at HACIA, a LATAM AI consulting firm. Analyze the client workflow and return a structured JSON analysis. Return ONLY raw JSON, no markdown, no explanation.\n\n'+maturityGuide+'\n\nTECH CONTEXT RULES:\n- If DB/ERP is declared: build integrations ON TOP of it, do not replace it.\n- If cloud is declared: anchor the architecture to that cloud, do not switch providers.\n- If stack is declared: use those languages/frameworks as the implementation layer.\n- If nothing is declared: propose the simplest viable architecture first.\n- preFlow must accurately reflect the REAL current painful process - use specific steps, not generic ones.\n- postFlow agents must be feasible given the tech maturity - name them specifically (e.g. "OCR Agent", "Validation Agent") not generically.\n- KPI values must be realistic for the industry and region (LATAM), not best-case scenarios from Silicon Valley reports.\n- All monetary values in CLP (Chilean pesos). 1 EUR=1150 CLP, 1 USD=950 CLP.\n\nRequired JSON fields:\n- processName: specific descriptive name\n- industry: industry sector\n- summary: 2-3 sentence executive summary of the problem and proposed solution\n- tags: array of 3 relevant tags\n- impact: {timeSaved, costReduction (in CLP), scale}\n- preTitle: label for current state flow\n- postTitle: label for AI-native flow\n- preFlow: {nodes: [{type, text}]} — types: start/pain/decision/end-node; decisions have branch:[{label, nodes}]. Minimum 6 nodes, maximum 12. Be specific about what is painful and why.\n- postFlow: {nodes: [{type, text}]} — types: start/agent/gain/decision/end-node. Each agent must have a specific name and action. Minimum 6 nodes.\n- techStack: array of 3-4 rows: {layer, tools:[], rationale} — tools must match the tech maturity level.\n- cloud: the cloud platform (or "on-premise" or "hybrid")\n- kpis: array of 3 KPIs: {name, direction, unit, preBaseline, conservative, expected, bestInClass, barPct, note, source} — values must be realistic for LATAM SMB/mid-market context.\n- recommendations: array of 3 strategic recommendations as strings\n- confidence: {overall (0-100), inputComprehension (0-100), architectureQuality (0-100), kpiReliability (0-100), flags:[{level:"ok"|"warn"|"risk", title, detail}], rationale}\n\nReturn ONLY the JSON object.';
 
 contentParts.push({type:'text',text:prompt});
 
