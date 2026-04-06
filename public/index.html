@@ -975,18 +975,18 @@ var outLang=LANG==='es'?'Respond entirely in Spanish.':'Respond in English.';
   // Construir guia de madurez tecnologica para el prompt
   var maturityGuide='';
   if(maturity==='basica'){
-    maturityGuide='TECH MATURITY: BASICA. The client has NO dedicated IT team, uses Excel/paper/WhatsApp as primary tools, and has NO cloud infrastructure. CRITICAL RULES FOR THIS MATURITY: (1) techStack MUST use only no-code/low-code tools: n8n, Make.com, Airtable, Google Sheets API, Zapier, Notion, WhatsApp Business API, simple webhooks. NO LangChain, NO FastAPI, NO Kubernetes, NO vector databases, NO custom ML models. (2) preFlow must show the painful manual steps in detail - this is what builds the case. (3) postFlow agents must be simple automations, not complex AI systems. (4) KPI improvements should be conservative (not aspirational). (5) investment should reflect low complexity: CLP $3M-$12M range. (6) timeline: 4-8 weeks.';
+    maturityGuide='TECH MATURITY: BASICA. The client has NO dedicated IT team, uses Excel/paper/WhatsApp as primary tools, and has NO cloud infrastructure. CRITICAL RULES FOR THIS MATURITY: (1) techStack MUST use only no-code/low-code tools: n8n, Make.com, Airtable, Google Sheets API, Zapier, Notion, WhatsApp Business API, simple webhooks. NO LangChain, NO FastAPI, NO Kubernetes, NO vector databases, NO custom ML models. (2) preFlow must show the painful manual steps in detail - this is what builds the case. (3) postFlow agents must be simple automations, not complex AI systems. (4) KPI improvements should be conservative (not aspirational). (5) investment should reflect low complexity: $3K-$12K USD range. (6) timeline: 4-8 weeks.';
   } else if(maturity==='media'){
-    maturityGuide='TECH MATURITY: MEDIA. The client has some ERP (SAP on-premise, legacy Oracle, local DB), basic IT support, possibly some cloud (Office 365, Google Workspace). CRITICAL RULES: (1) techStack must integrate WITH the existing systems declared - do not propose replacing them. Use their declared DB/ERP as the integration layer. (2) Prefer standard APIs, ODBC/JDBC connectors, file-based integrations over complex event streaming. (3) AI layer can be Claude API or Azure OpenAI via simple REST calls - no complex orchestration frameworks. (4) No Kubernetes, no microservices architecture unless explicitly declared. (5) investment: CLP $8M-$35M. (6) timeline: 8-14 weeks.';
+    maturityGuide='TECH MATURITY: MEDIA. The client has some ERP (SAP on-premise, legacy Oracle, local DB), basic IT support, possibly some cloud (Office 365, Google Workspace). CRITICAL RULES: (1) techStack must integrate WITH the existing systems declared - do not propose replacing them. Use their declared DB/ERP as the integration layer. (2) Prefer standard APIs, ODBC/JDBC connectors, file-based integrations over complex event streaming. (3) AI layer can be Claude API or Azure OpenAI via simple REST calls - no complex orchestration frameworks. (4) No Kubernetes, no microservices architecture unless explicitly declared. (5) investment: $8K-$35K USD. (6) timeline: 8-14 weeks.';
   } else if(maturity==='avanzada'){
-    maturityGuide='TECH MATURITY: AVANZADA. The client has active cloud (AWS/Azure/GCP), internal dev team, REST APIs already in use. CRITICAL RULES: (1) Use the declared cloud provider as anchor - do not mix clouds without reason. (2) Can propose LangChain/LangGraph, FastAPI, managed vector stores (Pinecone, Weaviate). (3) Integrations via native APIs and webhooks. (4) Can include CI/CD and staging environments. (5) investment: CLP $20M-$80M. (6) timeline: 10-18 weeks.';
+    maturityGuide='TECH MATURITY: AVANZADA. The client has active cloud (AWS/Azure/GCP), internal dev team, REST APIs already in use. CRITICAL RULES: (1) Use the declared cloud provider as anchor - do not mix clouds without reason. (2) Can propose LangChain/LangGraph, FastAPI, managed vector stores (Pinecone, Weaviate). (3) Integrations via native APIs and webhooks. (4) Can include CI/CD and staging environments. (5) investment: $20K-$80K USD. (6) timeline: 10-18 weeks.';
   } else if(maturity==='enterprise'){
-    maturityGuide='TECH MATURITY: ENTERPRISE. Client has SAP ECC/S4HANA or Oracle ERP, dedicated IT/infrastructure team, on-premise + cloud hybrid. CRITICAL RULES: (1) SAP integrations must use RFC/BAPI or SAP Cloud Connector - never direct DB access. (2) Can propose Semantic Kernel, Azure Durable Functions, enterprise service bus. (3) Security, audit trails, and change management are critical - include them in recommendations. (4) investment: CLP $50M-$200M+. (5) timeline: 16-26 weeks. (6) Always include a pilot/POC phase before full rollout.';
+    maturityGuide='TECH MATURITY: ENTERPRISE. Client has SAP ECC/S4HANA or Oracle ERP, dedicated IT/infrastructure team, on-premise + cloud hybrid. CRITICAL RULES: (1) SAP integrations must use RFC/BAPI or SAP Cloud Connector - never direct DB access. (2) Can propose Semantic Kernel, Azure Durable Functions, enterprise service bus. (3) Security, audit trails, and change management are critical - include them in recommendations. (4) investment: $50K-$200K+ USD. (5) timeline: 16-26 weeks. (6) Always include a pilot/POC phase before full rollout.';
   } else {
     maturityGuide='TECH MATURITY: UNKNOWN. Infer from the declared stack/DB/cloud fields. If nothing is declared, be conservative: propose simple integrations first and mention in recommendations that a technical discovery session is needed before committing to architecture.';
   }
 
-  var prompt=outLang+'\n\nYou are a senior AI consultant at HACIA, a LATAM AI consulting firm. Analyze the client workflow and return a structured JSON analysis. Return ONLY raw JSON, no markdown, no explanation.\n\n'+maturityGuide+'\n\nTECH CONTEXT RULES:\n- If DB/ERP is declared: build integrations ON TOP of it, do not replace it.\n- If cloud is declared: anchor the architecture to that cloud, do not switch providers.\n- If stack is declared: use those languages/frameworks as the implementation layer.\n- If nothing is declared: propose the simplest viable architecture first.\n- preFlow must accurately reflect the REAL current painful process - use specific steps, not generic ones.\n- postFlow agents must be feasible given the tech maturity - name them specifically (e.g. "OCR Agent", "Validation Agent") not generically.\n- KPI values must be realistic for the industry and region (LATAM), not best-case scenarios from Silicon Valley reports.\n- All monetary values in CLP (Chilean pesos). 1 EUR=1150 CLP, 1 USD=950 CLP.\n\nRequired JSON fields:\n- processName: specific descriptive name\n- industry: industry sector\n- summary: 2-3 sentence executive summary of the problem and proposed solution\n- tags: array of 3 relevant tags\n- impact: {timeSaved, costReduction (in CLP), scale}\n- preTitle: label for current state flow\n- postTitle: label for AI-native flow\n- preFlow: {nodes: [{type, text}]} — types: start/pain/decision/end-node; decisions have branch:[{label, nodes}]. Minimum 6 nodes, maximum 12. Be specific about what is painful and why.\n- postFlow: {nodes: [{type, text}]} — types: start/agent/gain/decision/end-node. Each agent must have a specific name and action. Minimum 6 nodes.\n- techStack: array of 3-4 rows: {layer, tools:[], rationale} — tools must match the tech maturity level.\n- cloud: the cloud platform (or "on-premise" or "hybrid")\n- kpis: array of 3 KPIs: {name, direction, unit, preBaseline, conservative, expected, bestInClass, barPct, note, source} — values must be realistic for LATAM SMB/mid-market context.\n- recommendations: array of 3 strategic recommendations as strings\n- confidence: {overall (0-100), inputComprehension (0-100), architectureQuality (0-100), kpiReliability (0-100), flags:[{level:"ok"|"warn"|"risk", title, detail}], rationale}\n\nReturn ONLY the JSON object.';
+  var prompt=outLang+'\n\nYou are a senior AI consultant at HACIA, a LATAM AI consulting firm. Analyze the client workflow and return a structured JSON analysis. Return ONLY raw JSON, no markdown, no explanation.\n\n'+maturityGuide+'\n\nTECH CONTEXT RULES:\n- If DB/ERP is declared: build integrations ON TOP of it, do not replace it.\n- If cloud is declared: anchor the architecture to that cloud, do not switch providers.\n- If stack is declared: use those languages/frameworks as the implementation layer.\n- If nothing is declared: propose the simplest viable architecture first.\n- preFlow must accurately reflect the REAL current painful process - use specific steps, not generic ones.\n- postFlow agents must be feasible given the tech maturity - name them specifically (e.g. "OCR Agent", "Validation Agent") not generically.\n- KPI values must be realistic for the industry and region (LATAM), not best-case scenarios from Silicon Valley reports.\n- All monetary values in USD. Convert EUR to USD (1 EUR = 1.21 USD) and CLP to USD (1 USD = 950 CLP). Always use $ symbol.\n\nRequired JSON fields:\n- processName: specific descriptive name\n- industry: industry sector\n- summary: 2-3 sentence executive summary of the problem and proposed solution\n- tags: array of 3 relevant tags\n- impact: {timeSaved, costReduction (in CLP), scale}\n- preTitle: label for current state flow\n- postTitle: label for AI-native flow\n- preFlow: {nodes: [{type, text}]} — types: start/pain/decision/end-node; decisions have branch:[{label, nodes}]. Minimum 6 nodes, maximum 12. Be specific about what is painful and why.\n- postFlow: {nodes: [{type, text}]} — types: start/agent/gain/decision/end-node. Each agent must have a specific name and action. Minimum 6 nodes.\n- techStack: array of 3-4 rows: {layer, tools:[], rationale} — tools must match the tech maturity level.\n- cloud: the cloud platform (or "on-premise" or "hybrid")\n- kpis: array of 3 KPIs: {name, direction, unit, preBaseline, conservative, expected, bestInClass, barPct, note, source} — values must be realistic for LATAM SMB/mid-market context.\n- recommendations: array of 3 strategic recommendations as strings\n- confidence: {overall (0-100), inputComprehension (0-100), architectureQuality (0-100), kpiReliability (0-100), flags:[{level:"ok"|"warn"|"risk", title, detail}], rationale}\n\nReturn ONLY the JSON object.';
 
 contentParts.push({type:'text',text:prompt});
 
@@ -1052,23 +1052,31 @@ function exportPDF(){
   btn.disabled=true;btn.textContent='Generating...';
   var isES=(window.LANG||'en')==='es';
   var EUR=1150,USD=950;
-  function fmtCLP(s){
+  function fmtUSD(s){
     if(!s)return s;
     s=String(s);
-    s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){var v=parseFloat(n.replace(/,/g,''));return 'CLP $'+Math.round(v*EUR).toLocaleString('es-CL');});
-    s=s.replace(/USD\s*([\d,.]+)/gi,function(m,n){var v=parseFloat(n.replace(/,/g,''));return 'CLP $'+Math.round(v*USD).toLocaleString('es-CL');});
-    s=s.replace(/\$\s*([\d,.]+)\s*(USD|usd)/g,function(m,n){var v=parseFloat(n.replace(/,/g,''));return 'CLP $'+Math.round(v*USD).toLocaleString('es-CL');});
+    // EUR -> USD (1 EUR ~= 1.21 USD)
+    s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){
+      var v=parseFloat(n.replace(/,/g,''));
+      return '$'+Math.round(v*1.21).toLocaleString('en-US');
+    });
+    // CLP -> USD (1 USD = 950 CLP)
+    s=s.replace(/CLP\s*\$?\s*([\d,.]+)/gi,function(m,n){
+      var v=parseFloat(n.replace(/[,.]/g,''));
+      if(v<10)return s; // evitar falsos positivos
+      return '$'+Math.round(v/950).toLocaleString('en-US');
+    });
     return s;
   }
-  var sys=isES?'Eres consultor senior de HACIA. Redacta documento ejecutivo en espanol profesional. Solo HTML semantico limpio (p,h2,h3,ul,li,table,tr,td,th,strong). Sin html/body/head. Sin markdown. Usa pesos chilenos CLP para cualquier valor monetario (1 EUR=1150 CLP, 1 USD=950 CLP).':'You are a senior HACIA consultant. Write executive document in professional English. Only clean semantic HTML (p,h2,h3,ul,li,table,tr,td,th,strong). No html/body/head. No markdown. Use Chilean pesos CLP for any monetary value (1 EUR=1150 CLP, 1 USD=950 CLP).';
-  var prompt=(isES?'Redacta documento ejecutivo. Secciones: 1)Resumen Ejecutivo, 2)Situacion Actual y Diagnostico, 3)Solucion AI Propuesta, 4)Stack Tecnologico, 5)KPIs e Impacto Proyectado, 6)Inversion y Timeline (en CLP), 7)Proximos Pasos. Datos:':'Write executive document. Sections: 1)Executive Summary, 2)Current Situation, 3)Proposed AI Solution, 4)Technology Stack, 5)KPIs & Impact, 6)Investment & Timeline (in CLP), 7)Next Steps. Data:')+' '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis,recommendations:r.recommendations,confidence:r.confidence?{overall:r.confidence.overall,rationale:r.confidence.rationale}:null});
+  var sys=isES?'Eres consultor senior de HACIA. Redacta documento ejecutivo en espanol profesional. Solo HTML semantico limpio (p,h2,h3,ul,li,table,tr,td,th,strong). Sin html/body/head. Sin markdown. Usa USD (dolares americanos) para cualquier valor monetario. Convierte EUR a USD (1 EUR=1.21 USD) y CLP a USD (1 USD=950 CLP). Usa simbolo $.':'You are a senior HACIA consultant. Write executive document in professional English. Only clean semantic HTML (p,h2,h3,ul,li,table,tr,td,th,strong). No html/body/head. No markdown. Use USD (US dollars) for any monetary value. Convert EUR to USD (1 EUR=1.21 USD) and CLP to USD (1 USD=950 CLP). Use $ symbol.';
+  var prompt=(isES?'Redacta documento ejecutivo. Secciones: 1)Resumen Ejecutivo, 2)Situacion Actual y Diagnostico, 3)Solucion AI Propuesta, 4)Stack Tecnologico, 5)KPIs e Impacto Proyectado, 6)Inversion y Timeline (en USD), 7)Proximos Pasos. Datos:':'Write executive document. Sections: 1)Executive Summary, 2)Current Situation, 3)Proposed AI Solution, 4)Technology Stack, 5)KPIs & Impact, 6)Investment & Timeline (in USD), 7)Next Steps. Data:')+' '+JSON.stringify({processName:r.processName,industry:r.industry,summary:r.summary,impact:r.impact,techStack:r.techStack,kpis:r.kpis,recommendations:r.recommendations,confidence:r.confidence?{overall:r.confidence.overall,rationale:r.confidence.rationale}:null});
   fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,system:sys,messages:[{role:'user',content:prompt}]})
   }).then(function(res){return res.json();})
   .then(function(data){
     var body=(data.content||[]).map(function(b){return b.type==='text'?b.text:'';}).join('');
     body=body.replace(/^```html?\s*/i,'').replace(/\s*```$/,'').trim();
-    body=fmtCLP(body);
+    body=fmtUSD(body);
     var now=new Date(),dateStr=now.toLocaleDateString(isES?'es-CL':'en-US',{year:'numeric',month:'long',day:'numeric'});
     var LOGO='https://hacia.ai/_next/image?url=%2Flogo-light.png&w=384&q=75';
     var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
@@ -1087,7 +1095,7 @@ function exportPDF(){
       return '<div class="'+cls+'">'+(nd.text||nd.label||'')+'</div>';
     }
     var archHTML='<div class="arch-wrap"><h2>'+(isES?'Arquitectura del Proceso — Pre vs Post IA':'Process Architecture — Pre vs Post AI')+'</h2><div class="arch-grid"><div><div class="arch-col-head arch-col-head-pre">'+(r.preTitle||(isES?'Proceso Manual Actual':'Current Manual Process'))+'</div><div class="arch-nodes">'+preNodes.slice(0,10).map(function(n){return archNode(n,true);}).join('')+'</div></div><div><div class="arch-col-head arch-col-head-post">'+(r.postTitle||(isES?'Orquestacion Autonoma con AI':'AI-Native Architecture'))+'</div><div class="arch-nodes">'+postNodes.slice(0,10).map(function(n){return archNode(n,false);}).join('')+'</div></div></div><div class="arch-key"><span class="ak ak-pain">'+(isES?'Manual/Dolor':'Manual/Pain')+'</span><span class="ak ak-agent">'+(isES?'Agente IA':'AI Agent')+'</span><span class="ak ak-gain">'+(isES?'Automatizado':'Automated')+'</span><span class="ak ak-dec">'+(isES?'Decision':'Decision')+'</span></div></div>';
-    var impCost=fmtCLP(r.impact?r.impact.costReduction:'');
+    var impCost=fmtUSD(r.impact?r.impact.costReduction:'');
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(r.processName||'Analysis')+' - HACIA</title><style>'+css+'</style></head><body><div class="page">';
     html+='<div class="hdr"><img class="hdr-logo" src="'+LOGO+'" alt="HACIA" onerror="this.style.display=\'none\'"><div class="hdr-meta"><strong>'+(r.processName||'')+'</strong><br>'+(r.industry||'')+'<br>'+dateStr+'</div></div>';
     html+='<div class="cover"><div class="c-badge">AI Transformation Proposal — HACIA</div><div class="c-title">'+(r.processName||'')+'</div><div class="c-sub">'+(r.industry||'')+'</div>';
@@ -1095,7 +1103,7 @@ function exportPDF(){
     html+='</div>';
     if(r.impact){html+='<div class="impact-row"><div class="ic"><div class="iv">'+(r.impact.timeSaved||'-')+'</div><div class="il">'+(isES?'Tiempo Ahorrado':'Time Saved')+'</div></div><div class="ic"><div class="iv">'+(impCost||r.impact.costReduction||'-')+'</div><div class="il">'+(isES?'Reduccion de Costo':'Cost Reduction')+'</div></div><div class="ic"><div class="iv">'+(r.impact.scale||'-')+'</div><div class="il">Scale</div></div></div>';}
     html+=archHTML+body;
-    if(r.confidence&&r.confidence.overall){var pct=r.confidence.overall;var col=pct>=75?'#0a7a52':pct>=50?'#9a4e00':'#c0182a';html+='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2><p>Score: <strong style="color:'+col+'">'+pct+'/100</strong></p><div class="conf-bar"><div class="conf-fill" style="width:'+pct+'%"></div></div>'+(r.confidence.rationale?'<p style="font-size:9.5pt;color:#565c72;margin-top:8px;">'+fmtCLP(r.confidence.rationale)+'</p>':'');}
+    if(r.confidence&&r.confidence.overall){var pct=r.confidence.overall;var col=pct>=75?'#0a7a52':pct>=50?'#9a4e00':'#c0182a';html+='<h2>'+(isES?'Confianza del Analisis':'Analysis Confidence')+'</h2><p>Score: <strong style="color:'+col+'">'+pct+'/100</strong></p><div class="conf-bar"><div class="conf-fill" style="width:'+pct+'%"></div></div>'+(r.confidence.rationale?'<p style="font-size:9.5pt;color:#565c72;margin-top:8px;">'+fmtUSD(r.confidence.rationale)+'</p>':'');}
     html+='<div class="footer"><span style="font-weight:600;letter-spacing:1px">CONFIDENCIAL — HACIA '+now.getFullYear()+'</span><span>hacia.ai</span><span>'+dateStr+'</span></div></div><button class="pbtn" onclick="window.print()">'+(isES?'Guardar como PDF':'Save as PDF')+'</button></body></html>';
     var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var url=URL.createObjectURL(blob);
@@ -1111,12 +1119,18 @@ function exportPPT(){
   var btn=document.getElementById('btnExportPPT');
   btn.disabled=true;btn.textContent='Building presentation...';
   var isES=(window.LANG||'en')==='es';
-  var EUR_CLP=1150,USD_CLP=950;
-  function toCLP(v){
+  function toUSD(v){
     if(!v)return v;v=String(v);
-    v=v.replace(/EUR\s*([\d,.]+)/gi,function(m,n){return 'CLP $'+Math.round(parseFloat(n.replace(/,/g,''))*EUR_CLP).toLocaleString('es-CL');});
-    v=v.replace(/USD\s*([\d,.]+)/gi,function(m,n){return 'CLP $'+Math.round(parseFloat(n.replace(/,/g,''))*USD_CLP).toLocaleString('es-CL');});
-    v=v.replace(/\$([\d,.]+)\s*(USD|usd)/g,function(m,n){return 'CLP $'+Math.round(parseFloat(n.replace(/,/g,''))*USD_CLP).toLocaleString('es-CL');});
+    // EUR -> USD
+    v=v.replace(/EUR\s*([\d,.]+)/gi,function(m,n){
+      return '$'+Math.round(parseFloat(n.replace(/,/g,''))*1.21).toLocaleString('en-US');
+    });
+    // CLP -> USD
+    v=v.replace(/CLP\s*\$?\s*([\d,.]+)/gi,function(m,n){
+      var val=parseFloat(n.replace(/[,.]/g,''));
+      if(val<10)return m;
+      return '$'+Math.round(val/950).toLocaleString('en-US');
+    });
     return v;
   }
   var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
@@ -1125,8 +1139,8 @@ function exportPPT(){
   var techRows=(r.techStack||[]).slice(0,4).map(function(row){return{layer:row.layer||'',tools:Array.isArray(row.tools)?row.tools.join(', '):(row.tools||''),rationale:row.rationale||''};});
   var recs=(r.recommendations||[]).slice(0,3).map(function(x){return(typeof x==='string'?x:(x.text||'')).substring(0,120);});
   var PROMPT=(isES
-    ?'Eres consultor senior de HACIA, firma AI en LATAM. Crea contenido ejecutivo para presentacion de 9 slides basado en el analisis. REGLAS: 1)Solo JSON valido sin markdown 2)Solo ASCII 3)Todas las monedas en CLP pesos chilenos (1 EUR=1150 CLP, 1 USD=950 CLP) 4)Usa datos reales del analisis, no inventes numeros 5)El contenido debe ser conciso y ejecutivo'
-    :'You are a senior HACIA consultant, AI firm in LATAM. Create executive content for a 9-slide presentation based on the analysis. RULES: 1)Only valid JSON no markdown 2)ASCII only 3)All currencies in CLP Chilean pesos (1 EUR=1150 CLP, 1 USD=950 CLP) 4)Use real data from analysis, do not invent numbers 5)Content must be concise and executive-level')
+    ?'Eres consultor senior de HACIA, firma AI en LATAM. Crea contenido ejecutivo para presentacion de 9 slides basado en el analisis. REGLAS: 1)Solo JSON valido sin markdown 2)Solo ASCII 3)Todas las monedas en USD dolares americanos (1 EUR=1.21 USD, 1 USD=950 CLP). Usa simbolo $ 4)Usa datos reales del analisis, no inventes numeros 5)El contenido debe ser conciso y ejecutivo'
+    :'You are a senior HACIA consultant, AI firm in LATAM. Create executive content for a 9-slide presentation based on the analysis. RULES: 1)Only valid JSON no markdown 2)ASCII only 3)All currencies in USD (1 EUR=1.21 USD, divide CLP by 950 to get USD) 4)Use real data from analysis, do not invent numbers 5)Content must be concise and executive-level')
     +'\nReturn this exact JSON structure:\n{"deck_title":"...","client_name":"...","slides":['
     +'{"id":1,"layout":"cover","title":"...","subtitle":"...","tag":"..."},'
     +'{"id":2,"layout":"diagnosis","title":"...","headline":"...","bullets":["...","...","..."]},'
@@ -1135,7 +1149,7 @@ function exportPPT(){
     +'{"id":5,"layout":"tech_stack","title":"...","headline":"...","layers":[{"layer":"...","tools":"...","role":"..."}]},'
     +'{"id":6,"layout":"kpis","title":"...","headline":"...","metrics":[{"name":"...","before":"...","after":"...","delta":"...","positive":true}]},'
     +'{"id":7,"layout":"impact","title":"...","headline":"...","time_saved":"...","cost_reduction":"...","scale":"...","insight":"..."},'
-    +'{"id":8,"layout":"investment","title":"...","headline":"...","min_price":"CLP $...","max_price":"CLP $...","timeline":"...","includes":["...","...","..."]},'
+    +'{"id":8,"layout":"investment","title":"...","headline":"...","min_price":"$...","max_price":"$...","timeline":"...","includes":["...","...","..."]},'
     +'{"id":9,"layout":"next_steps","title":"...","headline":"...","steps":[{"number":"01","title":"...","description":"..."}]}'
     +']}\n'
     +'ANALYSIS DATA:\nprocess='+JSON.stringify(r.processName)
@@ -1154,7 +1168,7 @@ function exportPPT(){
 
   fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,
-      system:'Return ONLY raw valid JSON. No markdown, no code fences. ASCII only in all string values. All monetary values must be in CLP (Chilean pesos).',
+      system:'Return ONLY raw valid JSON. No markdown, no code fences. ASCII only in all string values. All monetary values must be in USD. Use $ symbol.',
       messages:[{role:'user',content:PROMPT}]})
   }).then(function(res){return res.json();})
   .then(function(data){
@@ -1180,18 +1194,18 @@ function exportPPT(){
           {id:4,layout:'architecture',title:isES?'Arquitectura de Solucion':'AI Solution Architecture',headline:'',components:techRows.slice(0,4).map(function(t){return t.layer+': '+t.tools;})},
           {id:5,layout:'tech_stack',title:isES?'Stack Tecnologico':'Technology Stack',headline:'',layers:techRows},
           {id:6,layout:'kpis',title:isES?'KPIs Proyectados':'Projected KPIs',headline:'',metrics:kpiData.map(function(k){return{name:k.name,before:k.pre,after:k.expected,delta:k.bestInClass,positive:k.direction!=='down'};})},
-          {id:7,layout:'impact',title:isES?'Impacto de Negocio':'Business Impact',headline:'',time_saved:r.impact?r.impact.timeSaved:'-',cost_reduction:r.impact?toCLP(r.impact.costReduction):'-',scale:r.impact?r.impact.scale:'-',insight:(r.summary||'').substring(0,120)},
-          {id:8,layout:'investment',title:isES?'Inversion y Alcance':'Investment & Scope',headline:isES?'ROI estimado en 18 meses':'Estimated ROI in 18 months',min_price:'CLP $8.550.000',max_price:'CLP $23.750.000',timeline:isES?'10-12 semanas':'10-12 weeks',includes:[isES?'Arquitectura y diseno detallado':'Architecture & detailed design',isES?'Desarrollo e integracion de agentes IA':'AI agent development & integration',isES?'Despliegue, capacitacion y soporte 3 meses':'Deployment, training & 3-month support']},
+          {id:7,layout:'impact',title:isES?'Impacto de Negocio':'Business Impact',headline:'',time_saved:r.impact?r.impact.timeSaved:'-',cost_reduction:r.impact?toUSD(r.impact.costReduction):'-',scale:r.impact?r.impact.scale:'-',insight:(r.summary||'').substring(0,120)},
+          {id:8,layout:'investment',title:isES?'Inversion y Alcance':'Investment & Scope',headline:isES?'ROI estimado en 18 meses':'Estimated ROI in 18 months',min_price:'$9,000',max_price:'$25,000',timeline:isES?'10-12 semanas':'10-12 weeks',includes:[isES?'Arquitectura y diseno detallado':'Architecture & detailed design',isES?'Desarrollo e integracion de agentes IA':'AI agent development & integration',isES?'Despliegue, capacitacion y soporte 3 meses':'Deployment, training & 3-month support']},
           {id:9,layout:'next_steps',title:isES?'Proximos Pasos':'Next Steps',headline:isES?'Ruta de implementacion estructurada':'Structured implementation roadmap',steps:[{number:'01',title:isES?'Workshop de Descubrimiento':'Discovery Workshop',description:isES?'Mapeo completo del proceso con stakeholders clave':'Full process mapping with key stakeholders'},{number:'02',title:isES?'Prototipo Validado':'Validated Prototype',description:isES?'Construir y validar agente IA con datos reales':'Build and validate AI agent with real data'},{number:'03',title:isES?'Despliegue y Medicion':'Deploy & Measure',description:isES?'Go-live con monitoreo continuo de KPIs':'Go-live with continuous KPI monitoring'}]}
         ]};
       }
     }
-    buildPresentation(deck,r,preNodes,postNodes,isES,kpiData,techRows,toCLP);
+    buildPresentation(deck,r,preNodes,postNodes,isES,kpiData,techRows,toUSD);
     btn.disabled=false;btn.textContent='\uD83D\uDCCA Build PPT';
   }).catch(function(e){btn.disabled=false;btn.textContent='\uD83D\uDCCA Build PPT';alert('Error: '+e.message);});
 }
 
-function buildPresentation(deck,analysis,preNodes,postNodes,isES,kpiData,techRows,toCLP){
+function buildPresentation(deck,analysis,preNodes,postNodes,isES,kpiData,techRows,toUSD){
   var LOGO='https://hacia.ai/_next/image?url=%2Flogo-light.png&w=384&q=75';
   var brand='HACIA \u00b7 hacia.ai';
   var tot=(deck.slides||[]).length;
@@ -1232,9 +1246,9 @@ function buildPresentation(deck,analysis,preNodes,postNodes,isES,kpiData,techRow
         return '<div class="slide slide-dark"><div class="eyebrow">06 \u2014 '+(isES?'KPIs Proyectados':'Projected KPIs')+'</div><div class="stitle" style="font-size:36px;margin-bottom:10px;">'+(sl.title||'')+'</div><div class="shead">'+(sl.headline||'')+'</div><div class="kpi-cards">'+kms.slice(0,3).map(function(m){return'<div class="kpi-card"><div class="kpi-name">'+(m.name||'')+'</div><div class="kpi-vals"><span class="kpi-before">'+(m.before||'')+'</span><span class="kpi-after">'+(m.after||'')+'</span>'+(m.delta?'<span class="kpi-badge">'+m.delta+'</span>':'')+'</div></div>';}).join('')+'</div>'+footer+'</div>';
       case 'impact':
         var imp=analysis.impact||{};
-        return '<div class="slide slide-dark"><div class="eyebrow">07 \u2014 '+(isES?'Impacto de Negocio':'Business Impact')+'</div><div class="stitle" style="font-size:36px;margin-bottom:16px;">'+(sl.title||'')+'</div><div class="impact-cells"><div class="imp-cell"><div class="imp-lbl">'+(isES?'Tiempo Ahorrado':'Time Saved')+'</div><div class="imp-val">'+(sl.time_saved||imp.timeSaved||'-')+'</div></div><div class="imp-cell"><div class="imp-lbl">'+(isES?'Reduccion de Costo':'Cost Reduction')+'</div><div class="imp-val">'+toCLP(sl.cost_reduction||imp.costReduction||'-')+'</div></div><div class="imp-cell"><div class="imp-lbl">Scale</div><div class="imp-val">'+(sl.scale||imp.scale||'-')+'</div></div></div><div class="imp-insight">'+(sl.insight||sl.headline||'')+'</div>'+footer+'</div>';
+        return '<div class="slide slide-dark"><div class="eyebrow">07 \u2014 '+(isES?'Impacto de Negocio':'Business Impact')+'</div><div class="stitle" style="font-size:36px;margin-bottom:16px;">'+(sl.title||'')+'</div><div class="impact-cells"><div class="imp-cell"><div class="imp-lbl">'+(isES?'Tiempo Ahorrado':'Time Saved')+'</div><div class="imp-val">'+(sl.time_saved||imp.timeSaved||'-')+'</div></div><div class="imp-cell"><div class="imp-lbl">'+(isES?'Reduccion de Costo':'Cost Reduction')+'</div><div class="imp-val">'+toUSD(sl.cost_reduction||imp.costReduction||'-')+'</div></div><div class="imp-cell"><div class="imp-lbl">Scale</div><div class="imp-val">'+(sl.scale||imp.scale||'-')+'</div></div></div><div class="imp-insight">'+(sl.insight||sl.headline||'')+'</div>'+footer+'</div>';
       case 'investment':
-        return '<div class="slide slide-dark"><div class="eyebrow">08 \u2014 '+(isES?'Inversion':'Investment & Timeline')+'</div><div class="stitle" style="font-size:36px;margin-bottom:10px;">'+(sl.title||'')+'</div><div class="shead">'+(sl.headline||'')+'</div><div class="inv-cards"><div class="inv-card inv-min"><div class="inv-lbl">MIN</div><div class="inv-val ivm">'+toCLP(sl.min_price||'')+'</div></div><div class="inv-card inv-max"><div class="inv-lbl">MAX</div><div class="inv-val ivx">'+toCLP(sl.max_price||'')+'</div></div><div class="inv-card inv-time"><div class="inv-lbl">TIMELINE</div><div class="inv-val ivt">'+(sl.timeline||'')+'</div></div></div><ul class="inv-includes">'+(sl.includes||[]).map(function(i){return'<li>'+i+'</li>';}).join('')+'</ul>'+footer+'</div>';
+        return '<div class="slide slide-dark"><div class="eyebrow">08 \u2014 '+(isES?'Inversion':'Investment & Timeline')+'</div><div class="stitle" style="font-size:36px;margin-bottom:10px;">'+(sl.title||'')+'</div><div class="shead">'+(sl.headline||'')+'</div><div class="inv-cards"><div class="inv-card inv-min"><div class="inv-lbl">MIN</div><div class="inv-val ivm">'+toUSD(sl.min_price||'')+'</div></div><div class="inv-card inv-max"><div class="inv-lbl">MAX</div><div class="inv-val ivx">'+toUSD(sl.max_price||'')+'</div></div><div class="inv-card inv-time"><div class="inv-lbl">TIMELINE</div><div class="inv-val ivt">'+(sl.timeline||'')+'</div></div></div><ul class="inv-includes">'+(sl.includes||[]).map(function(i){return'<li>'+i+'</li>';}).join('')+'</ul>'+footer+'</div>';
       case 'next_steps':
         return '<div class="slide slide-dark"><div class="eyebrow">09 \u2014 '+(isES?'Proximos Pasos':'Next Steps')+'</div><div class="stitle" style="font-size:36px;margin-bottom:10px;">'+(sl.title||'')+'</div><div class="shead">'+(sl.headline||'')+'</div><div class="steps-col">'+(sl.steps||[]).slice(0,3).map(function(step){return'<div class="step-row"><span class="step-num">'+(step.number||'01')+'</span><div><div class="step-title">'+(step.title||'')+'</div><div class="step-desc">'+(step.description||'')+'</div></div></div>';}).join('')+'</div>'+footer+'</div>';
       default:
