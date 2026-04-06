@@ -1055,16 +1055,20 @@ function exportPDF(){
   function fmtUSD(s){
     if(!s)return s;
     s=String(s);
-    // EUR -> USD (1 EUR ~= 1.21 USD)
-    s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){
-      var v=parseFloat(n.replace(/,/g,''));
-      return '$'+Math.round(v*1.21).toLocaleString('en-US');
-    });
-    // CLP -> USD (1 USD = 950 CLP)
-    s=s.replace(/CLP\s*\$?\s*([\d,.]+)/gi,function(m,n){
+    var CLP_RATE=950,EUR_RATE=1.21;
+    function clpToUSD(v){return '$'+Math.round(v/CLP_RATE).toLocaleString('en-US');}
+    function eurToUSD(v){return '$'+Math.round(v*EUR_RATE).toLocaleString('en-US');}
+    // EUR XXX o EUR XXX,XXX
+    s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){return eurToUSD(parseFloat(n.replace(/,/g,'')));});
+    // CLP $XXX o CLP XXX (CLP antes del numero)
+    s=s.replace(/CLP\s*\$?\s*([\d][\d,.]*)/gi,function(m,n){
       var v=parseFloat(n.replace(/[,.]/g,''));
-      if(v<10)return s; // evitar falsos positivos
-      return '$'+Math.round(v/950).toLocaleString('en-US');
+      return v>=100?clpToUSD(v):m;
+    });
+    // XXX CLP o XXX,XXX CLP (numero antes de CLP)
+    s=s.replace(/([\d][\d,.]*)\s*CLP/gi,function(m,n){
+      var v=parseFloat(n.replace(/[,.]/g,''));
+      return v>=100?clpToUSD(v):m;
     });
     return s;
   }
@@ -1121,15 +1125,20 @@ function exportPPT(){
   var isES=(window.LANG||'en')==='es';
   function toUSD(v){
     if(!v)return v;v=String(v);
-    // EUR -> USD
-    v=v.replace(/EUR\s*([\d,.]+)/gi,function(m,n){
-      return '$'+Math.round(parseFloat(n.replace(/,/g,''))*1.21).toLocaleString('en-US');
-    });
-    // CLP -> USD
-    v=v.replace(/CLP\s*\$?\s*([\d,.]+)/gi,function(m,n){
+    var CLP_RATE=950,EUR_RATE=1.21;
+    function clpToUSD(n){return '$'+Math.round(n/CLP_RATE).toLocaleString('en-US');}
+    function eurToUSD(n){return '$'+Math.round(n*EUR_RATE).toLocaleString('en-US');}
+    // EUR XXX
+    v=v.replace(/EUR\s*([\d,.]+)/gi,function(m,n){return eurToUSD(parseFloat(n.replace(/,/g,'')));});
+    // CLP $XXX o CLP XXX
+    v=v.replace(/CLP\s*\$?\s*([\d][\d,.]*)/gi,function(m,n){
       var val=parseFloat(n.replace(/[,.]/g,''));
-      if(val<10)return m;
-      return '$'+Math.round(val/950).toLocaleString('en-US');
+      return val>=100?clpToUSD(val):m;
+    });
+    // XXX CLP
+    v=v.replace(/([\d][\d,.]*)\s*CLP/gi,function(m,n){
+      var val=parseFloat(n.replace(/[,.]/g,''));
+      return val>=100?clpToUSD(val):m;
     });
     return v;
   }
