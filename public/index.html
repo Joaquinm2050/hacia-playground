@@ -1051,10 +1051,16 @@ function renderAnalysis(r){var L=T[LANG];document.getElementById('azOutTitle').t
     var CLP_R=950,EUR_R=1.21;
     function cvt(s){
       if(!s||s==='—')return '—';
-      s=String(s);
-      s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){return '$'+Math.round(parseFloat(n.replace(/,/g,''))*EUR_R).toLocaleString('en-US');});
-      s=s.replace(/CLP\s*\$?\s*([\d][\d,.]*)/gi,function(m,n){var v=parseFloat(n.replace(/[,.]/g,''));return v>=100?'$'+Math.round(v/CLP_R).toLocaleString('en-US'):m;});
-      s=s.replace(/([\d][\d,.]*)\s*CLP/gi,function(m,n){var v=parseFloat(n.replace(/[,.]/g,''));return v>=100?'$'+Math.round(v/CLP_R).toLocaleString('en-US'):m;});
+      s=String(s).trim();
+      var CLP_R2=950,EUR_R2=1.21;
+      // EUR -> USD
+      s=s.replace(/EUR\s*([\d,.]+)/gi,function(m,n){return '$'+Math.round(parseFloat(n.replace(/,/g,''))*EUR_R2).toLocaleString('en-US');});
+      // CLP $XXXX o CLP XXXX
+      s=s.replace(/CLP\s*\$?\s*([\d][\d,.]*)/gi,function(m,n){var v=parseFloat(n.replace(/[,.]/g,''));return v>=100?'$'+Math.round(v/CLP_R2).toLocaleString('en-US'):m;});
+      // XXXX CLP
+      s=s.replace(/([\d][\d,.]*)\s*CLP/gi,function(m,n){var v=parseFloat(n.replace(/[,.]/g,''));return v>=100?'$'+Math.round(v/CLP_R2).toLocaleString('en-US'):m;});
+      // Numero puro >= 10000: asumir CLP
+      if(/^[\d][\d,.]+$/.test(s)){var _v=parseFloat(s.replace(/[,.]/g,''));if(_v>=10000)s='$'+Math.round(_v/CLP_R2).toLocaleString('en-US')+' USD';}
       return s;
     }
     var t=cvt(imp.timeSaved||'—');
@@ -1092,6 +1098,8 @@ function exportPDF(){
       var v=parseFloat(n.replace(/[,.]/g,''));
       return v>=100?clpToUSD(v):m;
     });
+    // Numero puro >= 10000 sin unidad: asumir CLP
+    if(/^[\d][\d,.\s]+$/.test(s.trim())){var _v=parseFloat(s.replace(/[,.]/g,''));if(_v>=10000)s='$'+Math.round(_v/950).toLocaleString('en-US')+' USD';}
     return s;
   }
   var sys=isES?'Eres consultor senior de HACIA. Redacta documento ejecutivo en espanol profesional. Solo HTML semantico limpio (p,h2,h3,ul,li,table,tr,td,th,strong). Sin html/body/head. Sin markdown. Usa USD (dolares americanos) para cualquier valor monetario. Convierte EUR a USD (1 EUR=1.21 USD) y CLP a USD (1 USD=950 CLP). Usa simbolo $.':'You are a senior HACIA consultant. Write executive document in professional English. Only clean semantic HTML (p,h2,h3,ul,li,table,tr,td,th,strong). No html/body/head. No markdown. Use USD (US dollars) for any monetary value. Convert EUR to USD (1 EUR=1.21 USD) and CLP to USD (1 USD=950 CLP). Use $ symbol.';
@@ -1162,6 +1170,8 @@ function exportPPT(){
       var val=parseFloat(n.replace(/[,.]/g,''));
       return val>=100?clpToUSD(val):m;
     });
+    // Numero puro >= 10000 sin unidad: asumir CLP
+    if(/^[\d][\d,.\s]+$/.test(v.trim())){var _vt=parseFloat(v.replace(/[,.]/g,''));if(_vt>=10000)v='$'+Math.round(_vt/950).toLocaleString('en-US')+' USD';}
     return v;
   }
   var preNodes=Array.isArray(r.preFlow)?r.preFlow:(r.preFlow&&r.preFlow.nodes?r.preFlow.nodes:[]);
