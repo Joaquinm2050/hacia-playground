@@ -236,13 +236,13 @@ textarea::placeholder{color:var(--ink-4)}
 .az-out-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .az-out-title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
 .az-out-sub{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-4);margin-top:3px}
-.az-summary{background:var(--ink);border-radius:8px;padding:24px 28px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+.az-summary{background:var(--ink);border-radius:8px;padding:24px 28px;margin-bottom:16px;display:flex;flex-direction:column;gap:16px}
 .az-summary-name{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px}
-.az-summary-title{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.4px;margin-bottom:8px}
-.az-summary-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;max-width:560px}
+.az-summary-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2x;margin-bottom:8px}
+.az-summary-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;max-width:560px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .az-summary-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
 .az-summary-tag{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:3px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55)}
-.az-impact-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden;margin-top:16px}
+.az-impact-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden}
 .az-impact-cell{padding:16px 18px;border-right:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
 .az-impact-cell:last-child{border-right:none}
 .az-impact-icon{font-size:16px;margin-bottom:6px}
@@ -1046,7 +1046,7 @@ function ciValClass(v){return v>=75?'high':v>=50?'med':'low';}
 function getCompNote(v){return LANG==='es'?(v>=75?'Contexto claro y suficiente':v>=50?'Contexto parcialmente claro':'Input ambiguo o insuficiente'):(v>=75?'Clear, sufficient context':v>=50?'Partially clear context':'Ambiguous or insufficient input');}
 function getArchNote(v){return LANG==='es'?(v>=75?'Arquitectura bien fundamentada':v>=50?'Plausible, validar supuestos':'Alta incertidumbre arquitectónica'):(v>=75?'Well-grounded architecture':v>=50?'Plausible, validate assumptions':'High architectural uncertainty');}
 function getKpiNote(v){return LANG==='es'?(v>=75?'KPIs anclados en benchmarks':v>=50?'Estimados, calibrar con cliente':'Muy aproximados, necesitan validación'):(v>=75?'KPIs anchored in benchmarks':v>=50?'Estimated, calibrate with client':'Rough KPIs, need validation');}
-function renderAnalysis(r){var L=T[LANG];document.getElementById('azOutTitle').textContent=r.processName||'Analysis Complete';document.getElementById('azOutSub').textContent=(r.industry||'')+L.azOutSubTpl;var imp=r.impact||{};var tags=(r.tags||[]).map(function(tg){return'<span class="az-summary-tag">'+tg+'</span>';}).join('');var html='';html+='<div class="az-summary"><div><div class="az-summary-name">'+(r.industry||'')+'</div><div class="az-summary-title">'+(r.processName||'')+'</div><div class="az-summary-desc">'+(r.summary||'')+'</div><div class="az-summary-tags">'+tags+'</div></div><div class="az-impact-strip">'
+function renderAnalysis(r){var L=T[LANG];document.getElementById('azOutTitle').textContent=r.processName||'Analysis Complete';document.getElementById('azOutSub').textContent=(r.industry||'')+L.azOutSubTpl;var imp=r.impact||{};var tags=(r.tags||[]).map(function(tg){return'<span class="az-summary-tag">'+tg+'</span>';}).join('');var html='';html+='<div class="az-summary"><div class="az-summary-name">'+(r.industry||'')+'</div><div class="az-summary-title">'+(r.processName||'')+'</div><div class="az-summary-desc">'+(r.summary||'')+'</div><div class="az-summary-tags">'+tags+'</div><div class="az-impact-strip">'
   +(function(){
     var CLP_R=950,EUR_R=1.21;
     function cvt(s){
